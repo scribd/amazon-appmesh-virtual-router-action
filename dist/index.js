@@ -218,7 +218,7 @@ async function deleteResource(client, parameters) {
  * @param {Object} parameters Parameters describing the Router
  * @return {Promise} that resolves to {@aws-sdk/client-app-mesh/DescribeVirtualRouterCommandOutput} or {@aws-sdk/client-app-mesh/CreateVirtualRouterCommandOutput}
  */
-async function crUpdate(client, parameters) {
+async function findOrCreate(client, parameters) {
   core.info(`Searching for ${parameters.virtualRouterName}`);
   try {
     const response = await describeResource(client, parameters);
@@ -356,7 +356,7 @@ async function run() {
     response = await deleteResource(client, parameters);
     await waitUntilResourceDeleted({client, maxWaitTime: 300}, parameters);
   } else {
-    response = await crUpdate(client, parameters);
+    response = await findOrCreate(client, parameters);
   }
 
   postToGithub(response);
@@ -377,7 +377,7 @@ if (require.main === require.cache[eval('__filename')]) {
 module.exports = {
   createInput,
   createResource,
-  crUpdate,
+  findOrCreate,
   deleteInput,
   deleteResource,
   describeInput,
