@@ -25,7 +25,7 @@ Creates an Amazon App Mesh Virtual Router
 
 ```yaml
 - name: App Mesh Virtual Router
-  uses: scribd/amazon-appmesh-virtual-router@master
+  uses: scribd/amazon-appmesh-virtual-router-action@v1
   with:
     name: my-virtual-router
     mesh-name: my-mesh-name
@@ -59,7 +59,7 @@ Deleting the resource requires `name`, `mesh-name`, and `action` to be specified
 
 ```yaml
 - name: App Mesh Virtual Router
-  uses: scribd/amazon-appmesh-virtual-router@master
+  uses: scribd/amazon-appmesh-virtual-router-action@v1
   with:
     name: my-virtual-router
     mesh-name: my-mesh-name
