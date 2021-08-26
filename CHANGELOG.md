@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.3...v1.0.4) (2021-08-26)
+
+
+### Bug Fixes
+
+* **deps:** bump @actions/core from 1.4.0 to 1.5.0 ([2fdaf78](https://github.com/scribd/amazon-appmesh-virtual-router-action/commit/2fdaf78d75d999cec6868773c94d3853ec4f87c5))
+
 ## [1.0.3](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.2...v1.0.3) (2021-08-26)
 
 
