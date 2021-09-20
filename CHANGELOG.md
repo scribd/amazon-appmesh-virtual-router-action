@@ -1,3 +1,10 @@
+## [1.0.12](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.11...v1.0.12) (2021-09-20)
+
+
+### Bug Fixes
+
+* **deps:** bump tmpl from 1.0.4 to 1.0.5 ([affee7f](https://github.com/scribd/amazon-appmesh-virtual-router-action/commit/affee7f262a31651a5466c4f6a85b11f7e2a9321))
+
 ## [1.0.11](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.10...v1.0.11) (2021-09-20)
 
 
