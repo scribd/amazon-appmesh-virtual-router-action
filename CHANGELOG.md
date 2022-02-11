@@ -1,3 +1,10 @@
+## [1.0.30](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.29...v1.0.30) (2022-02-11)
+
+
+### Bug Fixes
+
+* **deps:** bump @aws-sdk/client-app-mesh from 3.49.0 to 3.50.0 ([db52878](https://github.com/scribd/amazon-appmesh-virtual-router-action/commit/db52878dd8cf7fee126c0aa48cc1c500aae0cd0c))
+
 ## [1.0.29](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.28...v1.0.29) (2022-02-08)
 
 
