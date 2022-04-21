@@ -1,3 +1,10 @@
+## [1.0.38-alpha.1](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.37...v1.0.38-alpha.1) (2022-04-21)
+
+
+### Bug Fixes
+
+* **deps:** yarn upgrade 20220421 ([65c40e4](https://github.com/scribd/amazon-appmesh-virtual-router-action/commit/65c40e432d6b95bfe46cd48544c384a00e2065bd))
+
 ## [1.0.37](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.36...v1.0.37) (2022-04-21)
 
 
