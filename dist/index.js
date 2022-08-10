@@ -4,8 +4,8 @@
 /***/ 8996:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const core = __nccwpck_require__(6953);
-const {AppMeshClient, CreateVirtualRouterCommand, DeleteVirtualRouterCommand, DescribeVirtualRouterCommand} = __nccwpck_require__(9179);
+const core = __nccwpck_require__(5681);
+const {AppMeshClient, CreateVirtualRouterCommand, DeleteVirtualRouterCommand, DescribeVirtualRouterCommand} = __nccwpck_require__(9327);
 const _ = __nccwpck_require__(8513);
 
 
@@ -366,7 +366,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 7686:
+/***/ 1346:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -393,7 +393,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issue = exports.issueCommand = void 0;
 const os = __importStar(__nccwpck_require__(2037));
-const utils_1 = __nccwpck_require__(7334);
+const utils_1 = __nccwpck_require__(9754);
 /**
  * Commands
  *
@@ -465,7 +465,7 @@ function escapeProperty(s) {
 
 /***/ }),
 
-/***/ 6953:
+/***/ 5681:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -500,12 +500,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
-const command_1 = __nccwpck_require__(7686);
-const file_command_1 = __nccwpck_require__(2139);
-const utils_1 = __nccwpck_require__(7334);
+const command_1 = __nccwpck_require__(1346);
+const file_command_1 = __nccwpck_require__(1753);
+const utils_1 = __nccwpck_require__(9754);
 const os = __importStar(__nccwpck_require__(2037));
 const path = __importStar(__nccwpck_require__(1017));
-const oidc_utils_1 = __nccwpck_require__(4096);
+const uuid_1 = __nccwpck_require__(7066);
+const oidc_utils_1 = __nccwpck_require__(4892);
 /**
  * The code to exit an action
  */
@@ -534,7 +535,14 @@ function exportVariable(name, val) {
     process.env[name] = convertedVal;
     const filePath = process.env['GITHUB_ENV'] || '';
     if (filePath) {
-        const delimiter = '_GitHubActionsFileCommandDelimeter_';
+        const delimiter = `ghadelimiter_${uuid_1.v4()}`;
+        // These should realistically never happen, but just in case someone finds a way to exploit uuid generation let's not allow keys or values that contain the delimiter.
+        if (name.includes(delimiter)) {
+            throw new Error(`Unexpected input: name should not contain the delimiter "${delimiter}"`);
+        }
+        if (convertedVal.includes(delimiter)) {
+            throw new Error(`Unexpected input: value should not contain the delimiter "${delimiter}"`);
+        }
         const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
         file_command_1.issueCommand('ENV', commandValue);
     }
@@ -783,17 +791,17 @@ exports.getIDToken = getIDToken;
 /**
  * Summary exports
  */
-var summary_1 = __nccwpck_require__(8028);
+var summary_1 = __nccwpck_require__(5957);
 Object.defineProperty(exports, "summary", ({ enumerable: true, get: function () { return summary_1.summary; } }));
 /**
  * @deprecated use core.summary
  */
-var summary_2 = __nccwpck_require__(8028);
+var summary_2 = __nccwpck_require__(5957);
 Object.defineProperty(exports, "markdownSummary", ({ enumerable: true, get: function () { return summary_2.markdownSummary; } }));
 /**
  * Path exports
  */
-var path_utils_1 = __nccwpck_require__(9441);
+var path_utils_1 = __nccwpck_require__(891);
 Object.defineProperty(exports, "toPosixPath", ({ enumerable: true, get: function () { return path_utils_1.toPosixPath; } }));
 Object.defineProperty(exports, "toWin32Path", ({ enumerable: true, get: function () { return path_utils_1.toWin32Path; } }));
 Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: function () { return path_utils_1.toPlatformPath; } }));
@@ -801,7 +809,7 @@ Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: funct
 
 /***/ }),
 
-/***/ 2139:
+/***/ 1753:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -832,7 +840,7 @@ exports.issueCommand = void 0;
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs = __importStar(__nccwpck_require__(7147));
 const os = __importStar(__nccwpck_require__(2037));
-const utils_1 = __nccwpck_require__(7334);
+const utils_1 = __nccwpck_require__(9754);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
     if (!filePath) {
@@ -850,7 +858,7 @@ exports.issueCommand = issueCommand;
 
 /***/ }),
 
-/***/ 4096:
+/***/ 4892:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -868,7 +876,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OidcClient = void 0;
 const http_client_1 = __nccwpck_require__(9706);
 const auth_1 = __nccwpck_require__(8336);
-const core_1 = __nccwpck_require__(6953);
+const core_1 = __nccwpck_require__(5681);
 class OidcClient {
     static createHttpClient(allowRetry = true, maxRetry = 10) {
         const requestOptions = {
@@ -934,7 +942,7 @@ exports.OidcClient = OidcClient;
 
 /***/ }),
 
-/***/ 9441:
+/***/ 891:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -999,7 +1007,7 @@ exports.toPlatformPath = toPlatformPath;
 
 /***/ }),
 
-/***/ 8028:
+/***/ 5957:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -1289,7 +1297,7 @@ exports.summary = _summary;
 
 /***/ }),
 
-/***/ 7334:
+/***/ 9754:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -2104,52 +2112,52 @@ exports.checkBypass = checkBypass;
 
 /***/ }),
 
-/***/ 9026:
+/***/ 8227:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppMesh = void 0;
-const AppMeshClient_1 = __nccwpck_require__(164);
-const CreateGatewayRouteCommand_1 = __nccwpck_require__(1776);
-const CreateMeshCommand_1 = __nccwpck_require__(8497);
-const CreateRouteCommand_1 = __nccwpck_require__(9727);
-const CreateVirtualGatewayCommand_1 = __nccwpck_require__(1194);
-const CreateVirtualNodeCommand_1 = __nccwpck_require__(7900);
-const CreateVirtualRouterCommand_1 = __nccwpck_require__(9399);
-const CreateVirtualServiceCommand_1 = __nccwpck_require__(9649);
-const DeleteGatewayRouteCommand_1 = __nccwpck_require__(4798);
-const DeleteMeshCommand_1 = __nccwpck_require__(522);
-const DeleteRouteCommand_1 = __nccwpck_require__(1189);
-const DeleteVirtualGatewayCommand_1 = __nccwpck_require__(673);
-const DeleteVirtualNodeCommand_1 = __nccwpck_require__(6256);
-const DeleteVirtualRouterCommand_1 = __nccwpck_require__(1501);
-const DeleteVirtualServiceCommand_1 = __nccwpck_require__(2741);
-const DescribeGatewayRouteCommand_1 = __nccwpck_require__(6205);
-const DescribeMeshCommand_1 = __nccwpck_require__(1591);
-const DescribeRouteCommand_1 = __nccwpck_require__(3874);
-const DescribeVirtualGatewayCommand_1 = __nccwpck_require__(9217);
-const DescribeVirtualNodeCommand_1 = __nccwpck_require__(9505);
-const DescribeVirtualRouterCommand_1 = __nccwpck_require__(6401);
-const DescribeVirtualServiceCommand_1 = __nccwpck_require__(7427);
-const ListGatewayRoutesCommand_1 = __nccwpck_require__(14);
-const ListMeshesCommand_1 = __nccwpck_require__(1647);
-const ListRoutesCommand_1 = __nccwpck_require__(3348);
-const ListTagsForResourceCommand_1 = __nccwpck_require__(2627);
-const ListVirtualGatewaysCommand_1 = __nccwpck_require__(8056);
-const ListVirtualNodesCommand_1 = __nccwpck_require__(186);
-const ListVirtualRoutersCommand_1 = __nccwpck_require__(3066);
-const ListVirtualServicesCommand_1 = __nccwpck_require__(3470);
-const TagResourceCommand_1 = __nccwpck_require__(4373);
-const UntagResourceCommand_1 = __nccwpck_require__(3394);
-const UpdateGatewayRouteCommand_1 = __nccwpck_require__(5484);
-const UpdateMeshCommand_1 = __nccwpck_require__(6566);
-const UpdateRouteCommand_1 = __nccwpck_require__(400);
-const UpdateVirtualGatewayCommand_1 = __nccwpck_require__(9204);
-const UpdateVirtualNodeCommand_1 = __nccwpck_require__(1651);
-const UpdateVirtualRouterCommand_1 = __nccwpck_require__(3237);
-const UpdateVirtualServiceCommand_1 = __nccwpck_require__(918);
+const AppMeshClient_1 = __nccwpck_require__(9571);
+const CreateGatewayRouteCommand_1 = __nccwpck_require__(2080);
+const CreateMeshCommand_1 = __nccwpck_require__(8578);
+const CreateRouteCommand_1 = __nccwpck_require__(6094);
+const CreateVirtualGatewayCommand_1 = __nccwpck_require__(2153);
+const CreateVirtualNodeCommand_1 = __nccwpck_require__(5347);
+const CreateVirtualRouterCommand_1 = __nccwpck_require__(8443);
+const CreateVirtualServiceCommand_1 = __nccwpck_require__(9643);
+const DeleteGatewayRouteCommand_1 = __nccwpck_require__(354);
+const DeleteMeshCommand_1 = __nccwpck_require__(5893);
+const DeleteRouteCommand_1 = __nccwpck_require__(2375);
+const DeleteVirtualGatewayCommand_1 = __nccwpck_require__(197);
+const DeleteVirtualNodeCommand_1 = __nccwpck_require__(7230);
+const DeleteVirtualRouterCommand_1 = __nccwpck_require__(8366);
+const DeleteVirtualServiceCommand_1 = __nccwpck_require__(6441);
+const DescribeGatewayRouteCommand_1 = __nccwpck_require__(4818);
+const DescribeMeshCommand_1 = __nccwpck_require__(3352);
+const DescribeRouteCommand_1 = __nccwpck_require__(4309);
+const DescribeVirtualGatewayCommand_1 = __nccwpck_require__(5798);
+const DescribeVirtualNodeCommand_1 = __nccwpck_require__(7358);
+const DescribeVirtualRouterCommand_1 = __nccwpck_require__(4885);
+const DescribeVirtualServiceCommand_1 = __nccwpck_require__(9555);
+const ListGatewayRoutesCommand_1 = __nccwpck_require__(273);
+const ListMeshesCommand_1 = __nccwpck_require__(6406);
+const ListRoutesCommand_1 = __nccwpck_require__(8845);
+const ListTagsForResourceCommand_1 = __nccwpck_require__(2458);
+const ListVirtualGatewaysCommand_1 = __nccwpck_require__(8069);
+const ListVirtualNodesCommand_1 = __nccwpck_require__(2887);
+const ListVirtualRoutersCommand_1 = __nccwpck_require__(6158);
+const ListVirtualServicesCommand_1 = __nccwpck_require__(4649);
+const TagResourceCommand_1 = __nccwpck_require__(7157);
+const UntagResourceCommand_1 = __nccwpck_require__(1524);
+const UpdateGatewayRouteCommand_1 = __nccwpck_require__(2491);
+const UpdateMeshCommand_1 = __nccwpck_require__(3149);
+const UpdateRouteCommand_1 = __nccwpck_require__(6115);
+const UpdateVirtualGatewayCommand_1 = __nccwpck_require__(1746);
+const UpdateVirtualNodeCommand_1 = __nccwpck_require__(9097);
+const UpdateVirtualRouterCommand_1 = __nccwpck_require__(5807);
+const UpdateVirtualServiceCommand_1 = __nccwpck_require__(5754);
 class AppMesh extends AppMeshClient_1.AppMeshClient {
     createGatewayRoute(args, optionsOrCb, cb) {
         const command = new CreateGatewayRouteCommand_1.CreateGatewayRouteCommand(args);
@@ -2689,7 +2697,7 @@ exports.AppMesh = AppMesh;
 
 /***/ }),
 
-/***/ 164:
+/***/ 9571:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -2704,8 +2712,8 @@ const middleware_recursion_detection_1 = __nccwpck_require__(9585);
 const middleware_retry_1 = __nccwpck_require__(6472);
 const middleware_signing_1 = __nccwpck_require__(7146);
 const middleware_user_agent_1 = __nccwpck_require__(5508);
-const smithy_client_1 = __nccwpck_require__(6449);
-const runtimeConfig_1 = __nccwpck_require__(9412);
+const smithy_client_1 = __nccwpck_require__(1529);
+const runtimeConfig_1 = __nccwpck_require__(7819);
 class AppMeshClient extends smithy_client_1.Client {
     constructor(configuration) {
         const _config_0 = (0, runtimeConfig_1.getRuntimeConfig)(configuration);
@@ -2734,7 +2742,7 @@ exports.AppMeshClient = AppMeshClient;
 
 /***/ }),
 
-/***/ 1776:
+/***/ 2080:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -2742,9 +2750,9 @@ exports.AppMeshClient = AppMeshClient;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateGatewayRouteCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class CreateGatewayRouteCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -2778,7 +2786,7 @@ exports.CreateGatewayRouteCommand = CreateGatewayRouteCommand;
 
 /***/ }),
 
-/***/ 8497:
+/***/ 8578:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -2786,9 +2794,9 @@ exports.CreateGatewayRouteCommand = CreateGatewayRouteCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateMeshCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class CreateMeshCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -2822,7 +2830,7 @@ exports.CreateMeshCommand = CreateMeshCommand;
 
 /***/ }),
 
-/***/ 9727:
+/***/ 6094:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -2830,9 +2838,9 @@ exports.CreateMeshCommand = CreateMeshCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateRouteCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class CreateRouteCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -2866,7 +2874,7 @@ exports.CreateRouteCommand = CreateRouteCommand;
 
 /***/ }),
 
-/***/ 1194:
+/***/ 2153:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -2874,9 +2882,9 @@ exports.CreateRouteCommand = CreateRouteCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateVirtualGatewayCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class CreateVirtualGatewayCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -2910,7 +2918,7 @@ exports.CreateVirtualGatewayCommand = CreateVirtualGatewayCommand;
 
 /***/ }),
 
-/***/ 7900:
+/***/ 5347:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -2918,9 +2926,9 @@ exports.CreateVirtualGatewayCommand = CreateVirtualGatewayCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateVirtualNodeCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class CreateVirtualNodeCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -2954,7 +2962,7 @@ exports.CreateVirtualNodeCommand = CreateVirtualNodeCommand;
 
 /***/ }),
 
-/***/ 9399:
+/***/ 8443:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -2962,9 +2970,9 @@ exports.CreateVirtualNodeCommand = CreateVirtualNodeCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateVirtualRouterCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class CreateVirtualRouterCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -2998,7 +3006,7 @@ exports.CreateVirtualRouterCommand = CreateVirtualRouterCommand;
 
 /***/ }),
 
-/***/ 9649:
+/***/ 9643:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3006,9 +3014,9 @@ exports.CreateVirtualRouterCommand = CreateVirtualRouterCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateVirtualServiceCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class CreateVirtualServiceCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3042,7 +3050,7 @@ exports.CreateVirtualServiceCommand = CreateVirtualServiceCommand;
 
 /***/ }),
 
-/***/ 4798:
+/***/ 354:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3050,9 +3058,9 @@ exports.CreateVirtualServiceCommand = CreateVirtualServiceCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DeleteGatewayRouteCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DeleteGatewayRouteCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3086,7 +3094,7 @@ exports.DeleteGatewayRouteCommand = DeleteGatewayRouteCommand;
 
 /***/ }),
 
-/***/ 522:
+/***/ 5893:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3094,9 +3102,9 @@ exports.DeleteGatewayRouteCommand = DeleteGatewayRouteCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DeleteMeshCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DeleteMeshCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3130,7 +3138,7 @@ exports.DeleteMeshCommand = DeleteMeshCommand;
 
 /***/ }),
 
-/***/ 1189:
+/***/ 2375:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3138,9 +3146,9 @@ exports.DeleteMeshCommand = DeleteMeshCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DeleteRouteCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DeleteRouteCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3174,7 +3182,7 @@ exports.DeleteRouteCommand = DeleteRouteCommand;
 
 /***/ }),
 
-/***/ 673:
+/***/ 197:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3182,9 +3190,9 @@ exports.DeleteRouteCommand = DeleteRouteCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DeleteVirtualGatewayCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DeleteVirtualGatewayCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3218,7 +3226,7 @@ exports.DeleteVirtualGatewayCommand = DeleteVirtualGatewayCommand;
 
 /***/ }),
 
-/***/ 6256:
+/***/ 7230:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3226,9 +3234,9 @@ exports.DeleteVirtualGatewayCommand = DeleteVirtualGatewayCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DeleteVirtualNodeCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DeleteVirtualNodeCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3262,7 +3270,7 @@ exports.DeleteVirtualNodeCommand = DeleteVirtualNodeCommand;
 
 /***/ }),
 
-/***/ 1501:
+/***/ 8366:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3270,9 +3278,9 @@ exports.DeleteVirtualNodeCommand = DeleteVirtualNodeCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DeleteVirtualRouterCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DeleteVirtualRouterCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3306,7 +3314,7 @@ exports.DeleteVirtualRouterCommand = DeleteVirtualRouterCommand;
 
 /***/ }),
 
-/***/ 2741:
+/***/ 6441:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3314,9 +3322,9 @@ exports.DeleteVirtualRouterCommand = DeleteVirtualRouterCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DeleteVirtualServiceCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DeleteVirtualServiceCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3350,7 +3358,7 @@ exports.DeleteVirtualServiceCommand = DeleteVirtualServiceCommand;
 
 /***/ }),
 
-/***/ 6205:
+/***/ 4818:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3358,9 +3366,9 @@ exports.DeleteVirtualServiceCommand = DeleteVirtualServiceCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DescribeGatewayRouteCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DescribeGatewayRouteCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3394,7 +3402,7 @@ exports.DescribeGatewayRouteCommand = DescribeGatewayRouteCommand;
 
 /***/ }),
 
-/***/ 1591:
+/***/ 3352:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3402,9 +3410,9 @@ exports.DescribeGatewayRouteCommand = DescribeGatewayRouteCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DescribeMeshCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DescribeMeshCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3438,7 +3446,7 @@ exports.DescribeMeshCommand = DescribeMeshCommand;
 
 /***/ }),
 
-/***/ 3874:
+/***/ 4309:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3446,9 +3454,9 @@ exports.DescribeMeshCommand = DescribeMeshCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DescribeRouteCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DescribeRouteCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3482,7 +3490,7 @@ exports.DescribeRouteCommand = DescribeRouteCommand;
 
 /***/ }),
 
-/***/ 9217:
+/***/ 5798:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3490,9 +3498,9 @@ exports.DescribeRouteCommand = DescribeRouteCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DescribeVirtualGatewayCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DescribeVirtualGatewayCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3526,7 +3534,7 @@ exports.DescribeVirtualGatewayCommand = DescribeVirtualGatewayCommand;
 
 /***/ }),
 
-/***/ 9505:
+/***/ 7358:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3534,9 +3542,9 @@ exports.DescribeVirtualGatewayCommand = DescribeVirtualGatewayCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DescribeVirtualNodeCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DescribeVirtualNodeCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3570,7 +3578,7 @@ exports.DescribeVirtualNodeCommand = DescribeVirtualNodeCommand;
 
 /***/ }),
 
-/***/ 6401:
+/***/ 4885:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3578,9 +3586,9 @@ exports.DescribeVirtualNodeCommand = DescribeVirtualNodeCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DescribeVirtualRouterCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DescribeVirtualRouterCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3614,7 +3622,7 @@ exports.DescribeVirtualRouterCommand = DescribeVirtualRouterCommand;
 
 /***/ }),
 
-/***/ 7427:
+/***/ 9555:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3622,9 +3630,9 @@ exports.DescribeVirtualRouterCommand = DescribeVirtualRouterCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DescribeVirtualServiceCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class DescribeVirtualServiceCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3658,7 +3666,7 @@ exports.DescribeVirtualServiceCommand = DescribeVirtualServiceCommand;
 
 /***/ }),
 
-/***/ 14:
+/***/ 273:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3666,9 +3674,9 @@ exports.DescribeVirtualServiceCommand = DescribeVirtualServiceCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListGatewayRoutesCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class ListGatewayRoutesCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3702,7 +3710,7 @@ exports.ListGatewayRoutesCommand = ListGatewayRoutesCommand;
 
 /***/ }),
 
-/***/ 1647:
+/***/ 6406:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3710,9 +3718,9 @@ exports.ListGatewayRoutesCommand = ListGatewayRoutesCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListMeshesCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class ListMeshesCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3746,7 +3754,7 @@ exports.ListMeshesCommand = ListMeshesCommand;
 
 /***/ }),
 
-/***/ 3348:
+/***/ 8845:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3754,9 +3762,9 @@ exports.ListMeshesCommand = ListMeshesCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListRoutesCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class ListRoutesCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3790,7 +3798,7 @@ exports.ListRoutesCommand = ListRoutesCommand;
 
 /***/ }),
 
-/***/ 2627:
+/***/ 2458:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3798,9 +3806,9 @@ exports.ListRoutesCommand = ListRoutesCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListTagsForResourceCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class ListTagsForResourceCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3834,7 +3842,7 @@ exports.ListTagsForResourceCommand = ListTagsForResourceCommand;
 
 /***/ }),
 
-/***/ 8056:
+/***/ 8069:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3842,9 +3850,9 @@ exports.ListTagsForResourceCommand = ListTagsForResourceCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListVirtualGatewaysCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class ListVirtualGatewaysCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3878,7 +3886,7 @@ exports.ListVirtualGatewaysCommand = ListVirtualGatewaysCommand;
 
 /***/ }),
 
-/***/ 186:
+/***/ 2887:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3886,9 +3894,9 @@ exports.ListVirtualGatewaysCommand = ListVirtualGatewaysCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListVirtualNodesCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class ListVirtualNodesCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3922,7 +3930,7 @@ exports.ListVirtualNodesCommand = ListVirtualNodesCommand;
 
 /***/ }),
 
-/***/ 3066:
+/***/ 6158:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3930,9 +3938,9 @@ exports.ListVirtualNodesCommand = ListVirtualNodesCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListVirtualRoutersCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class ListVirtualRoutersCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -3966,7 +3974,7 @@ exports.ListVirtualRoutersCommand = ListVirtualRoutersCommand;
 
 /***/ }),
 
-/***/ 3470:
+/***/ 4649:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3974,9 +3982,9 @@ exports.ListVirtualRoutersCommand = ListVirtualRoutersCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListVirtualServicesCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class ListVirtualServicesCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -4010,7 +4018,7 @@ exports.ListVirtualServicesCommand = ListVirtualServicesCommand;
 
 /***/ }),
 
-/***/ 4373:
+/***/ 7157:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4018,9 +4026,9 @@ exports.ListVirtualServicesCommand = ListVirtualServicesCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TagResourceCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class TagResourceCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -4054,7 +4062,7 @@ exports.TagResourceCommand = TagResourceCommand;
 
 /***/ }),
 
-/***/ 3394:
+/***/ 1524:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4062,9 +4070,9 @@ exports.TagResourceCommand = TagResourceCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UntagResourceCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class UntagResourceCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -4098,7 +4106,7 @@ exports.UntagResourceCommand = UntagResourceCommand;
 
 /***/ }),
 
-/***/ 5484:
+/***/ 2491:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4106,9 +4114,9 @@ exports.UntagResourceCommand = UntagResourceCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UpdateGatewayRouteCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class UpdateGatewayRouteCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -4142,7 +4150,7 @@ exports.UpdateGatewayRouteCommand = UpdateGatewayRouteCommand;
 
 /***/ }),
 
-/***/ 6566:
+/***/ 3149:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4150,9 +4158,9 @@ exports.UpdateGatewayRouteCommand = UpdateGatewayRouteCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UpdateMeshCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class UpdateMeshCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -4186,7 +4194,7 @@ exports.UpdateMeshCommand = UpdateMeshCommand;
 
 /***/ }),
 
-/***/ 400:
+/***/ 6115:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4194,9 +4202,9 @@ exports.UpdateMeshCommand = UpdateMeshCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UpdateRouteCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class UpdateRouteCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -4230,7 +4238,7 @@ exports.UpdateRouteCommand = UpdateRouteCommand;
 
 /***/ }),
 
-/***/ 9204:
+/***/ 1746:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4238,9 +4246,9 @@ exports.UpdateRouteCommand = UpdateRouteCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UpdateVirtualGatewayCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class UpdateVirtualGatewayCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -4274,7 +4282,7 @@ exports.UpdateVirtualGatewayCommand = UpdateVirtualGatewayCommand;
 
 /***/ }),
 
-/***/ 1651:
+/***/ 9097:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4282,9 +4290,9 @@ exports.UpdateVirtualGatewayCommand = UpdateVirtualGatewayCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UpdateVirtualNodeCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class UpdateVirtualNodeCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -4318,7 +4326,7 @@ exports.UpdateVirtualNodeCommand = UpdateVirtualNodeCommand;
 
 /***/ }),
 
-/***/ 3237:
+/***/ 5807:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4326,9 +4334,9 @@ exports.UpdateVirtualNodeCommand = UpdateVirtualNodeCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UpdateVirtualRouterCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class UpdateVirtualRouterCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -4362,7 +4370,7 @@ exports.UpdateVirtualRouterCommand = UpdateVirtualRouterCommand;
 
 /***/ }),
 
-/***/ 918:
+/***/ 5754:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4370,9 +4378,9 @@ exports.UpdateVirtualRouterCommand = UpdateVirtualRouterCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UpdateVirtualServiceCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(7761);
-const Aws_restJson1_1 = __nccwpck_require__(4334);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(814);
+const Aws_restJson1_1 = __nccwpck_require__(8417);
 class UpdateVirtualServiceCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -4406,56 +4414,56 @@ exports.UpdateVirtualServiceCommand = UpdateVirtualServiceCommand;
 
 /***/ }),
 
-/***/ 6359:
+/***/ 7467:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(1776), exports);
-tslib_1.__exportStar(__nccwpck_require__(8497), exports);
-tslib_1.__exportStar(__nccwpck_require__(9727), exports);
-tslib_1.__exportStar(__nccwpck_require__(1194), exports);
-tslib_1.__exportStar(__nccwpck_require__(7900), exports);
-tslib_1.__exportStar(__nccwpck_require__(9399), exports);
-tslib_1.__exportStar(__nccwpck_require__(9649), exports);
-tslib_1.__exportStar(__nccwpck_require__(4798), exports);
-tslib_1.__exportStar(__nccwpck_require__(522), exports);
-tslib_1.__exportStar(__nccwpck_require__(1189), exports);
-tslib_1.__exportStar(__nccwpck_require__(673), exports);
-tslib_1.__exportStar(__nccwpck_require__(6256), exports);
-tslib_1.__exportStar(__nccwpck_require__(1501), exports);
-tslib_1.__exportStar(__nccwpck_require__(2741), exports);
-tslib_1.__exportStar(__nccwpck_require__(6205), exports);
-tslib_1.__exportStar(__nccwpck_require__(1591), exports);
-tslib_1.__exportStar(__nccwpck_require__(3874), exports);
-tslib_1.__exportStar(__nccwpck_require__(9217), exports);
-tslib_1.__exportStar(__nccwpck_require__(9505), exports);
-tslib_1.__exportStar(__nccwpck_require__(6401), exports);
-tslib_1.__exportStar(__nccwpck_require__(7427), exports);
-tslib_1.__exportStar(__nccwpck_require__(14), exports);
-tslib_1.__exportStar(__nccwpck_require__(1647), exports);
-tslib_1.__exportStar(__nccwpck_require__(3348), exports);
-tslib_1.__exportStar(__nccwpck_require__(2627), exports);
-tslib_1.__exportStar(__nccwpck_require__(8056), exports);
-tslib_1.__exportStar(__nccwpck_require__(186), exports);
-tslib_1.__exportStar(__nccwpck_require__(3066), exports);
-tslib_1.__exportStar(__nccwpck_require__(3470), exports);
-tslib_1.__exportStar(__nccwpck_require__(4373), exports);
-tslib_1.__exportStar(__nccwpck_require__(3394), exports);
-tslib_1.__exportStar(__nccwpck_require__(5484), exports);
-tslib_1.__exportStar(__nccwpck_require__(6566), exports);
-tslib_1.__exportStar(__nccwpck_require__(400), exports);
-tslib_1.__exportStar(__nccwpck_require__(9204), exports);
-tslib_1.__exportStar(__nccwpck_require__(1651), exports);
-tslib_1.__exportStar(__nccwpck_require__(3237), exports);
-tslib_1.__exportStar(__nccwpck_require__(918), exports);
+tslib_1.__exportStar(__nccwpck_require__(2080), exports);
+tslib_1.__exportStar(__nccwpck_require__(8578), exports);
+tslib_1.__exportStar(__nccwpck_require__(6094), exports);
+tslib_1.__exportStar(__nccwpck_require__(2153), exports);
+tslib_1.__exportStar(__nccwpck_require__(5347), exports);
+tslib_1.__exportStar(__nccwpck_require__(8443), exports);
+tslib_1.__exportStar(__nccwpck_require__(9643), exports);
+tslib_1.__exportStar(__nccwpck_require__(354), exports);
+tslib_1.__exportStar(__nccwpck_require__(5893), exports);
+tslib_1.__exportStar(__nccwpck_require__(2375), exports);
+tslib_1.__exportStar(__nccwpck_require__(197), exports);
+tslib_1.__exportStar(__nccwpck_require__(7230), exports);
+tslib_1.__exportStar(__nccwpck_require__(8366), exports);
+tslib_1.__exportStar(__nccwpck_require__(6441), exports);
+tslib_1.__exportStar(__nccwpck_require__(4818), exports);
+tslib_1.__exportStar(__nccwpck_require__(3352), exports);
+tslib_1.__exportStar(__nccwpck_require__(4309), exports);
+tslib_1.__exportStar(__nccwpck_require__(5798), exports);
+tslib_1.__exportStar(__nccwpck_require__(7358), exports);
+tslib_1.__exportStar(__nccwpck_require__(4885), exports);
+tslib_1.__exportStar(__nccwpck_require__(9555), exports);
+tslib_1.__exportStar(__nccwpck_require__(273), exports);
+tslib_1.__exportStar(__nccwpck_require__(6406), exports);
+tslib_1.__exportStar(__nccwpck_require__(8845), exports);
+tslib_1.__exportStar(__nccwpck_require__(2458), exports);
+tslib_1.__exportStar(__nccwpck_require__(8069), exports);
+tslib_1.__exportStar(__nccwpck_require__(2887), exports);
+tslib_1.__exportStar(__nccwpck_require__(6158), exports);
+tslib_1.__exportStar(__nccwpck_require__(4649), exports);
+tslib_1.__exportStar(__nccwpck_require__(7157), exports);
+tslib_1.__exportStar(__nccwpck_require__(1524), exports);
+tslib_1.__exportStar(__nccwpck_require__(2491), exports);
+tslib_1.__exportStar(__nccwpck_require__(3149), exports);
+tslib_1.__exportStar(__nccwpck_require__(6115), exports);
+tslib_1.__exportStar(__nccwpck_require__(1746), exports);
+tslib_1.__exportStar(__nccwpck_require__(9097), exports);
+tslib_1.__exportStar(__nccwpck_require__(5807), exports);
+tslib_1.__exportStar(__nccwpck_require__(5754), exports);
 
 
 /***/ }),
 
-/***/ 9968:
+/***/ 9655:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4496,6 +4504,14 @@ const regionHash = {
             },
         ],
     },
+    "ap-northeast-3": {
+        variants: [
+            {
+                hostname: "appmesh.ap-northeast-3.api.aws",
+                tags: ["dualstack"],
+            },
+        ],
+    },
     "ap-south-1": {
         variants: [
             {
@@ -4516,6 +4532,14 @@ const regionHash = {
         variants: [
             {
                 hostname: "appmesh.ap-southeast-2.api.aws",
+                tags: ["dualstack"],
+            },
+        ],
+    },
+    "ap-southeast-3": {
+        variants: [
+            {
+                hostname: "appmesh.ap-southeast-3.api.aws",
                 tags: ["dualstack"],
             },
         ],
@@ -4771,7 +4795,7 @@ exports.defaultRegionInfoProvider = defaultRegionInfoProvider;
 
 /***/ }),
 
-/***/ 9179:
+/***/ 9327:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4779,25 +4803,25 @@ exports.defaultRegionInfoProvider = defaultRegionInfoProvider;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppMeshServiceException = void 0;
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(9026), exports);
-tslib_1.__exportStar(__nccwpck_require__(164), exports);
-tslib_1.__exportStar(__nccwpck_require__(6359), exports);
-tslib_1.__exportStar(__nccwpck_require__(7054), exports);
-tslib_1.__exportStar(__nccwpck_require__(6229), exports);
-var AppMeshServiceException_1 = __nccwpck_require__(9788);
+tslib_1.__exportStar(__nccwpck_require__(8227), exports);
+tslib_1.__exportStar(__nccwpck_require__(9571), exports);
+tslib_1.__exportStar(__nccwpck_require__(7467), exports);
+tslib_1.__exportStar(__nccwpck_require__(925), exports);
+tslib_1.__exportStar(__nccwpck_require__(2866), exports);
+var AppMeshServiceException_1 = __nccwpck_require__(5958);
 Object.defineProperty(exports, "AppMeshServiceException", ({ enumerable: true, get: function () { return AppMeshServiceException_1.AppMeshServiceException; } }));
 
 
 /***/ }),
 
-/***/ 9788:
+/***/ 5958:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppMeshServiceException = void 0;
-const smithy_client_1 = __nccwpck_require__(6449);
+const smithy_client_1 = __nccwpck_require__(1529);
 class AppMeshServiceException extends smithy_client_1.ServiceException {
     constructor(options) {
         super(options);
@@ -4809,19 +4833,19 @@ exports.AppMeshServiceException = AppMeshServiceException;
 
 /***/ }),
 
-/***/ 7054:
+/***/ 925:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(7761), exports);
+tslib_1.__exportStar(__nccwpck_require__(814), exports);
 
 
 /***/ }),
 
-/***/ 7761:
+/***/ 814:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4833,7 +4857,7 @@ exports.ListenerTlsFileCertificateFilterSensitiveLog = exports.UpdateVirtualGate
 exports.UpdateVirtualNodeOutputFilterSensitiveLog = exports.UpdateVirtualNodeInputFilterSensitiveLog = exports.ListVirtualNodesOutputFilterSensitiveLog = exports.VirtualNodeRefFilterSensitiveLog = exports.ListVirtualNodesInputFilterSensitiveLog = exports.DescribeVirtualNodeOutputFilterSensitiveLog = exports.DescribeVirtualNodeInputFilterSensitiveLog = exports.DeleteVirtualNodeOutputFilterSensitiveLog = exports.DeleteVirtualNodeInputFilterSensitiveLog = exports.CreateVirtualNodeOutputFilterSensitiveLog = exports.VirtualNodeDataFilterSensitiveLog = exports.VirtualNodeStatusFilterSensitiveLog = exports.CreateVirtualNodeInputFilterSensitiveLog = exports.VirtualNodeSpecFilterSensitiveLog = exports.ServiceDiscoveryFilterSensitiveLog = exports.DnsServiceDiscoveryFilterSensitiveLog = exports.AwsCloudMapServiceDiscoveryFilterSensitiveLog = exports.AwsCloudMapInstanceAttributeFilterSensitiveLog = exports.LoggingFilterSensitiveLog = exports.ListenerFilterSensitiveLog = exports.ListenerTlsFilterSensitiveLog = exports.ListenerTlsValidationContextFilterSensitiveLog = exports.ListenerTlsValidationContextTrustFilterSensitiveLog = exports.ListenerTlsCertificateFilterSensitiveLog = exports.ListenerTlsAcmCertificateFilterSensitiveLog = exports.ListenerTimeoutFilterSensitiveLog = exports.TcpTimeoutFilterSensitiveLog = exports.HttpTimeoutFilterSensitiveLog = exports.GrpcTimeoutFilterSensitiveLog = exports.PortMappingFilterSensitiveLog = exports.OutlierDetectionFilterSensitiveLog = exports.DurationFilterSensitiveLog = exports.HealthCheckPolicyFilterSensitiveLog = exports.VirtualNodeConnectionPoolFilterSensitiveLog = exports.VirtualNodeTcpConnectionPoolFilterSensitiveLog = exports.VirtualNodeHttp2ConnectionPoolFilterSensitiveLog = exports.VirtualNodeHttpConnectionPoolFilterSensitiveLog = exports.VirtualNodeGrpcConnectionPoolFilterSensitiveLog = exports.BackendFilterSensitiveLog = exports.VirtualServiceBackendFilterSensitiveLog = exports.BackendDefaultsFilterSensitiveLog = exports.ClientPolicyFilterSensitiveLog = exports.ClientPolicyTlsFilterSensitiveLog = exports.TlsValidationContextFilterSensitiveLog = exports.TlsValidationContextTrustFilterSensitiveLog = exports.TlsValidationContextSdsTrustFilterSensitiveLog = exports.TlsValidationContextFileTrustFilterSensitiveLog = exports.TlsValidationContextAcmTrustFilterSensitiveLog = exports.ClientTlsCertificateFilterSensitiveLog = exports.ListenerTlsSdsCertificateFilterSensitiveLog = void 0;
 exports.VirtualServiceDataFilterSensitiveLog = exports.VirtualServiceStatusFilterSensitiveLog = exports.CreateVirtualServiceInputFilterSensitiveLog = exports.VirtualServiceSpecFilterSensitiveLog = exports.VirtualServiceProviderFilterSensitiveLog = exports.VirtualRouterServiceProviderFilterSensitiveLog = exports.VirtualNodeServiceProviderFilterSensitiveLog = exports.UpdateVirtualRouterOutputFilterSensitiveLog = exports.UpdateVirtualRouterInputFilterSensitiveLog = exports.UpdateRouteOutputFilterSensitiveLog = exports.UpdateRouteInputFilterSensitiveLog = exports.ListRoutesOutputFilterSensitiveLog = exports.RouteRefFilterSensitiveLog = exports.ListRoutesInputFilterSensitiveLog = exports.DescribeRouteOutputFilterSensitiveLog = exports.DescribeRouteInputFilterSensitiveLog = exports.DeleteRouteOutputFilterSensitiveLog = exports.DeleteRouteInputFilterSensitiveLog = exports.CreateRouteOutputFilterSensitiveLog = exports.RouteDataFilterSensitiveLog = exports.RouteStatusFilterSensitiveLog = exports.CreateRouteInputFilterSensitiveLog = exports.RouteSpecFilterSensitiveLog = exports.TcpRouteFilterSensitiveLog = exports.TcpRouteActionFilterSensitiveLog = exports.HttpRouteFilterSensitiveLog = exports.HttpRetryPolicyFilterSensitiveLog = exports.HttpRouteMatchFilterSensitiveLog = exports.HttpRouteHeaderFilterSensitiveLog = exports.HttpRouteActionFilterSensitiveLog = exports.GrpcRouteFilterSensitiveLog = exports.GrpcRetryPolicyFilterSensitiveLog = exports.GrpcRouteMatchFilterSensitiveLog = exports.GrpcRouteMetadataFilterSensitiveLog = exports.GrpcRouteMetadataMatchMethodFilterSensitiveLog = exports.GrpcRouteActionFilterSensitiveLog = exports.WeightedTargetFilterSensitiveLog = exports.ListVirtualRoutersOutputFilterSensitiveLog = exports.VirtualRouterRefFilterSensitiveLog = exports.ListVirtualRoutersInputFilterSensitiveLog = exports.DescribeVirtualRouterOutputFilterSensitiveLog = exports.DescribeVirtualRouterInputFilterSensitiveLog = exports.DeleteVirtualRouterOutputFilterSensitiveLog = exports.DeleteVirtualRouterInputFilterSensitiveLog = exports.CreateVirtualRouterOutputFilterSensitiveLog = exports.VirtualRouterDataFilterSensitiveLog = exports.VirtualRouterStatusFilterSensitiveLog = exports.CreateVirtualRouterInputFilterSensitiveLog = exports.VirtualRouterSpecFilterSensitiveLog = exports.VirtualRouterListenerFilterSensitiveLog = void 0;
 exports.UntagResourceOutputFilterSensitiveLog = exports.UntagResourceInputFilterSensitiveLog = exports.TagResourceOutputFilterSensitiveLog = exports.TagResourceInputFilterSensitiveLog = exports.UpdateVirtualServiceOutputFilterSensitiveLog = exports.UpdateVirtualServiceInputFilterSensitiveLog = exports.ListVirtualServicesOutputFilterSensitiveLog = exports.VirtualServiceRefFilterSensitiveLog = exports.ListVirtualServicesInputFilterSensitiveLog = exports.DescribeVirtualServiceOutputFilterSensitiveLog = exports.DescribeVirtualServiceInputFilterSensitiveLog = exports.DeleteVirtualServiceOutputFilterSensitiveLog = exports.DeleteVirtualServiceInputFilterSensitiveLog = exports.CreateVirtualServiceOutputFilterSensitiveLog = void 0;
-const AppMeshServiceException_1 = __nccwpck_require__(9788);
+const AppMeshServiceException_1 = __nccwpck_require__(5958);
 var AccessLog;
 (function (AccessLog) {
     AccessLog.visit = (value, visitor) => {
@@ -6363,7 +6387,7 @@ exports.UntagResourceOutputFilterSensitiveLog = UntagResourceOutputFilterSensiti
 
 /***/ }),
 
-/***/ 3531:
+/***/ 6662:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6373,16 +6397,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 385:
+/***/ 6407:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.paginateListGatewayRoutes = void 0;
-const AppMesh_1 = __nccwpck_require__(9026);
-const AppMeshClient_1 = __nccwpck_require__(164);
-const ListGatewayRoutesCommand_1 = __nccwpck_require__(14);
+const AppMesh_1 = __nccwpck_require__(8227);
+const AppMeshClient_1 = __nccwpck_require__(9571);
+const ListGatewayRoutesCommand_1 = __nccwpck_require__(273);
 const makePagedClientRequest = async (client, input, ...args) => {
     return await client.send(new ListGatewayRoutesCommand_1.ListGatewayRoutesCommand(input), ...args);
 };
@@ -6417,16 +6441,16 @@ exports.paginateListGatewayRoutes = paginateListGatewayRoutes;
 
 /***/ }),
 
-/***/ 6620:
+/***/ 7285:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.paginateListMeshes = void 0;
-const AppMesh_1 = __nccwpck_require__(9026);
-const AppMeshClient_1 = __nccwpck_require__(164);
-const ListMeshesCommand_1 = __nccwpck_require__(1647);
+const AppMesh_1 = __nccwpck_require__(8227);
+const AppMeshClient_1 = __nccwpck_require__(9571);
+const ListMeshesCommand_1 = __nccwpck_require__(6406);
 const makePagedClientRequest = async (client, input, ...args) => {
     return await client.send(new ListMeshesCommand_1.ListMeshesCommand(input), ...args);
 };
@@ -6461,16 +6485,16 @@ exports.paginateListMeshes = paginateListMeshes;
 
 /***/ }),
 
-/***/ 4911:
+/***/ 8718:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.paginateListRoutes = void 0;
-const AppMesh_1 = __nccwpck_require__(9026);
-const AppMeshClient_1 = __nccwpck_require__(164);
-const ListRoutesCommand_1 = __nccwpck_require__(3348);
+const AppMesh_1 = __nccwpck_require__(8227);
+const AppMeshClient_1 = __nccwpck_require__(9571);
+const ListRoutesCommand_1 = __nccwpck_require__(8845);
 const makePagedClientRequest = async (client, input, ...args) => {
     return await client.send(new ListRoutesCommand_1.ListRoutesCommand(input), ...args);
 };
@@ -6505,16 +6529,16 @@ exports.paginateListRoutes = paginateListRoutes;
 
 /***/ }),
 
-/***/ 6717:
+/***/ 4558:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.paginateListTagsForResource = void 0;
-const AppMesh_1 = __nccwpck_require__(9026);
-const AppMeshClient_1 = __nccwpck_require__(164);
-const ListTagsForResourceCommand_1 = __nccwpck_require__(2627);
+const AppMesh_1 = __nccwpck_require__(8227);
+const AppMeshClient_1 = __nccwpck_require__(9571);
+const ListTagsForResourceCommand_1 = __nccwpck_require__(2458);
 const makePagedClientRequest = async (client, input, ...args) => {
     return await client.send(new ListTagsForResourceCommand_1.ListTagsForResourceCommand(input), ...args);
 };
@@ -6549,16 +6573,16 @@ exports.paginateListTagsForResource = paginateListTagsForResource;
 
 /***/ }),
 
-/***/ 3499:
+/***/ 2742:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.paginateListVirtualGateways = void 0;
-const AppMesh_1 = __nccwpck_require__(9026);
-const AppMeshClient_1 = __nccwpck_require__(164);
-const ListVirtualGatewaysCommand_1 = __nccwpck_require__(8056);
+const AppMesh_1 = __nccwpck_require__(8227);
+const AppMeshClient_1 = __nccwpck_require__(9571);
+const ListVirtualGatewaysCommand_1 = __nccwpck_require__(8069);
 const makePagedClientRequest = async (client, input, ...args) => {
     return await client.send(new ListVirtualGatewaysCommand_1.ListVirtualGatewaysCommand(input), ...args);
 };
@@ -6593,16 +6617,16 @@ exports.paginateListVirtualGateways = paginateListVirtualGateways;
 
 /***/ }),
 
-/***/ 8340:
+/***/ 6875:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.paginateListVirtualNodes = void 0;
-const AppMesh_1 = __nccwpck_require__(9026);
-const AppMeshClient_1 = __nccwpck_require__(164);
-const ListVirtualNodesCommand_1 = __nccwpck_require__(186);
+const AppMesh_1 = __nccwpck_require__(8227);
+const AppMeshClient_1 = __nccwpck_require__(9571);
+const ListVirtualNodesCommand_1 = __nccwpck_require__(2887);
 const makePagedClientRequest = async (client, input, ...args) => {
     return await client.send(new ListVirtualNodesCommand_1.ListVirtualNodesCommand(input), ...args);
 };
@@ -6637,16 +6661,16 @@ exports.paginateListVirtualNodes = paginateListVirtualNodes;
 
 /***/ }),
 
-/***/ 1775:
+/***/ 3808:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.paginateListVirtualRouters = void 0;
-const AppMesh_1 = __nccwpck_require__(9026);
-const AppMeshClient_1 = __nccwpck_require__(164);
-const ListVirtualRoutersCommand_1 = __nccwpck_require__(3066);
+const AppMesh_1 = __nccwpck_require__(8227);
+const AppMeshClient_1 = __nccwpck_require__(9571);
+const ListVirtualRoutersCommand_1 = __nccwpck_require__(6158);
 const makePagedClientRequest = async (client, input, ...args) => {
     return await client.send(new ListVirtualRoutersCommand_1.ListVirtualRoutersCommand(input), ...args);
 };
@@ -6681,16 +6705,16 @@ exports.paginateListVirtualRouters = paginateListVirtualRouters;
 
 /***/ }),
 
-/***/ 4409:
+/***/ 2995:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.paginateListVirtualServices = void 0;
-const AppMesh_1 = __nccwpck_require__(9026);
-const AppMeshClient_1 = __nccwpck_require__(164);
-const ListVirtualServicesCommand_1 = __nccwpck_require__(3470);
+const AppMesh_1 = __nccwpck_require__(8227);
+const AppMeshClient_1 = __nccwpck_require__(9571);
+const ListVirtualServicesCommand_1 = __nccwpck_require__(4649);
 const makePagedClientRequest = async (client, input, ...args) => {
     return await client.send(new ListVirtualServicesCommand_1.ListVirtualServicesCommand(input), ...args);
 };
@@ -6725,27 +6749,27 @@ exports.paginateListVirtualServices = paginateListVirtualServices;
 
 /***/ }),
 
-/***/ 6229:
+/***/ 2866:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(3531), exports);
-tslib_1.__exportStar(__nccwpck_require__(385), exports);
-tslib_1.__exportStar(__nccwpck_require__(6620), exports);
-tslib_1.__exportStar(__nccwpck_require__(4911), exports);
-tslib_1.__exportStar(__nccwpck_require__(6717), exports);
-tslib_1.__exportStar(__nccwpck_require__(3499), exports);
-tslib_1.__exportStar(__nccwpck_require__(8340), exports);
-tslib_1.__exportStar(__nccwpck_require__(1775), exports);
-tslib_1.__exportStar(__nccwpck_require__(4409), exports);
+tslib_1.__exportStar(__nccwpck_require__(6662), exports);
+tslib_1.__exportStar(__nccwpck_require__(6407), exports);
+tslib_1.__exportStar(__nccwpck_require__(7285), exports);
+tslib_1.__exportStar(__nccwpck_require__(8718), exports);
+tslib_1.__exportStar(__nccwpck_require__(4558), exports);
+tslib_1.__exportStar(__nccwpck_require__(2742), exports);
+tslib_1.__exportStar(__nccwpck_require__(6875), exports);
+tslib_1.__exportStar(__nccwpck_require__(3808), exports);
+tslib_1.__exportStar(__nccwpck_require__(2995), exports);
 
 
 /***/ }),
 
-/***/ 4334:
+/***/ 8417:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -6754,10 +6778,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deserializeAws_restJson1DeleteVirtualNodeCommand = exports.deserializeAws_restJson1DeleteVirtualGatewayCommand = exports.deserializeAws_restJson1DeleteRouteCommand = exports.deserializeAws_restJson1DeleteMeshCommand = exports.deserializeAws_restJson1DeleteGatewayRouteCommand = exports.deserializeAws_restJson1CreateVirtualServiceCommand = exports.deserializeAws_restJson1CreateVirtualRouterCommand = exports.deserializeAws_restJson1CreateVirtualNodeCommand = exports.deserializeAws_restJson1CreateVirtualGatewayCommand = exports.deserializeAws_restJson1CreateRouteCommand = exports.deserializeAws_restJson1CreateMeshCommand = exports.deserializeAws_restJson1CreateGatewayRouteCommand = exports.serializeAws_restJson1UpdateVirtualServiceCommand = exports.serializeAws_restJson1UpdateVirtualRouterCommand = exports.serializeAws_restJson1UpdateVirtualNodeCommand = exports.serializeAws_restJson1UpdateVirtualGatewayCommand = exports.serializeAws_restJson1UpdateRouteCommand = exports.serializeAws_restJson1UpdateMeshCommand = exports.serializeAws_restJson1UpdateGatewayRouteCommand = exports.serializeAws_restJson1UntagResourceCommand = exports.serializeAws_restJson1TagResourceCommand = exports.serializeAws_restJson1ListVirtualServicesCommand = exports.serializeAws_restJson1ListVirtualRoutersCommand = exports.serializeAws_restJson1ListVirtualNodesCommand = exports.serializeAws_restJson1ListVirtualGatewaysCommand = exports.serializeAws_restJson1ListTagsForResourceCommand = exports.serializeAws_restJson1ListRoutesCommand = exports.serializeAws_restJson1ListMeshesCommand = exports.serializeAws_restJson1ListGatewayRoutesCommand = exports.serializeAws_restJson1DescribeVirtualServiceCommand = exports.serializeAws_restJson1DescribeVirtualRouterCommand = exports.serializeAws_restJson1DescribeVirtualNodeCommand = exports.serializeAws_restJson1DescribeVirtualGatewayCommand = exports.serializeAws_restJson1DescribeRouteCommand = exports.serializeAws_restJson1DescribeMeshCommand = exports.serializeAws_restJson1DescribeGatewayRouteCommand = exports.serializeAws_restJson1DeleteVirtualServiceCommand = exports.serializeAws_restJson1DeleteVirtualRouterCommand = exports.serializeAws_restJson1DeleteVirtualNodeCommand = exports.serializeAws_restJson1DeleteVirtualGatewayCommand = exports.serializeAws_restJson1DeleteRouteCommand = exports.serializeAws_restJson1DeleteMeshCommand = exports.serializeAws_restJson1DeleteGatewayRouteCommand = exports.serializeAws_restJson1CreateVirtualServiceCommand = exports.serializeAws_restJson1CreateVirtualRouterCommand = exports.serializeAws_restJson1CreateVirtualNodeCommand = exports.serializeAws_restJson1CreateVirtualGatewayCommand = exports.serializeAws_restJson1CreateRouteCommand = exports.serializeAws_restJson1CreateMeshCommand = exports.serializeAws_restJson1CreateGatewayRouteCommand = void 0;
 exports.deserializeAws_restJson1UpdateVirtualServiceCommand = exports.deserializeAws_restJson1UpdateVirtualRouterCommand = exports.deserializeAws_restJson1UpdateVirtualNodeCommand = exports.deserializeAws_restJson1UpdateVirtualGatewayCommand = exports.deserializeAws_restJson1UpdateRouteCommand = exports.deserializeAws_restJson1UpdateMeshCommand = exports.deserializeAws_restJson1UpdateGatewayRouteCommand = exports.deserializeAws_restJson1UntagResourceCommand = exports.deserializeAws_restJson1TagResourceCommand = exports.deserializeAws_restJson1ListVirtualServicesCommand = exports.deserializeAws_restJson1ListVirtualRoutersCommand = exports.deserializeAws_restJson1ListVirtualNodesCommand = exports.deserializeAws_restJson1ListVirtualGatewaysCommand = exports.deserializeAws_restJson1ListTagsForResourceCommand = exports.deserializeAws_restJson1ListRoutesCommand = exports.deserializeAws_restJson1ListMeshesCommand = exports.deserializeAws_restJson1ListGatewayRoutesCommand = exports.deserializeAws_restJson1DescribeVirtualServiceCommand = exports.deserializeAws_restJson1DescribeVirtualRouterCommand = exports.deserializeAws_restJson1DescribeVirtualNodeCommand = exports.deserializeAws_restJson1DescribeVirtualGatewayCommand = exports.deserializeAws_restJson1DescribeRouteCommand = exports.deserializeAws_restJson1DescribeMeshCommand = exports.deserializeAws_restJson1DescribeGatewayRouteCommand = exports.deserializeAws_restJson1DeleteVirtualServiceCommand = exports.deserializeAws_restJson1DeleteVirtualRouterCommand = void 0;
 const protocol_http_1 = __nccwpck_require__(9992);
-const smithy_client_1 = __nccwpck_require__(6449);
+const smithy_client_1 = __nccwpck_require__(1529);
 const uuid_1 = __nccwpck_require__(7066);
-const AppMeshServiceException_1 = __nccwpck_require__(9788);
-const models_0_1 = __nccwpck_require__(7761);
+const AppMeshServiceException_1 = __nccwpck_require__(5958);
+const models_0_1 = __nccwpck_require__(814);
 const serializeAws_restJson1CreateGatewayRouteCommand = async (input, context) => {
     var _a;
     const { hostname, protocol = "https", port, path: basePath } = await context.endpoint();
@@ -6766,29 +6790,11 @@ const serializeAws_restJson1CreateGatewayRouteCommand = async (input, context) =
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualGateway/{virtualGatewayName}/gatewayRoutes";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    if (input.virtualGatewayName !== undefined) {
-        const labelValue = input.virtualGatewayName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualGatewayName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualGatewayName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualGatewayName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualGatewayName", () => input.virtualGatewayName, "{virtualGatewayName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -6841,29 +6847,11 @@ const serializeAws_restJson1CreateRouteCommand = async (input, context) => {
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualRouter/{virtualRouterName}/routes";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    if (input.virtualRouterName !== undefined) {
-        const labelValue = input.virtualRouterName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualRouterName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualRouterName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualRouterName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualRouterName", () => input.virtualRouterName, "{virtualRouterName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -6891,19 +6879,10 @@ const serializeAws_restJson1CreateVirtualGatewayCommand = async (input, context)
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualGateways";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -6930,19 +6909,10 @@ const serializeAws_restJson1CreateVirtualNodeCommand = async (input, context) =>
         "content-type": "application/json",
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/v20190125/meshes/{meshName}/virtualNodes";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -6970,19 +6940,10 @@ const serializeAws_restJson1CreateVirtualRouterCommand = async (input, context) 
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualRouters";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -7010,19 +6971,10 @@ const serializeAws_restJson1CreateVirtualServiceCommand = async (input, context)
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualServices";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -7047,39 +6999,12 @@ const serializeAws_restJson1DeleteGatewayRouteCommand = async (input, context) =
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualGateway/{virtualGatewayName}/gatewayRoutes/{gatewayRouteName}";
-    if (input.gatewayRouteName !== undefined) {
-        const labelValue = input.gatewayRouteName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: gatewayRouteName.");
-        }
-        resolvedPath = resolvedPath.replace("{gatewayRouteName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: gatewayRouteName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    if (input.virtualGatewayName !== undefined) {
-        const labelValue = input.virtualGatewayName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualGatewayName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualGatewayName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualGatewayName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "gatewayRouteName", () => input.gatewayRouteName, "{gatewayRouteName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualGatewayName", () => input.virtualGatewayName, "{virtualGatewayName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7097,16 +7022,7 @@ const serializeAws_restJson1DeleteMeshCommand = async (input, context) => {
     const { hostname, protocol = "https", port, path: basePath } = await context.endpoint();
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/v20190125/meshes/{meshName}";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7124,39 +7040,12 @@ const serializeAws_restJson1DeleteRouteCommand = async (input, context) => {
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualRouter/{virtualRouterName}/routes/{routeName}";
-    if (input.routeName !== undefined) {
-        const labelValue = input.routeName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: routeName.");
-        }
-        resolvedPath = resolvedPath.replace("{routeName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: routeName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    if (input.virtualRouterName !== undefined) {
-        const labelValue = input.virtualRouterName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualRouterName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualRouterName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualRouterName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "routeName", () => input.routeName, "{routeName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualRouterName", () => input.virtualRouterName, "{virtualRouterName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7175,29 +7064,11 @@ const serializeAws_restJson1DeleteVirtualGatewayCommand = async (input, context)
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualGateways/{virtualGatewayName}";
-    if (input.virtualGatewayName !== undefined) {
-        const labelValue = input.virtualGatewayName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualGatewayName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualGatewayName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualGatewayName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualGatewayName", () => input.virtualGatewayName, "{virtualGatewayName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7216,29 +7087,11 @@ const serializeAws_restJson1DeleteVirtualNodeCommand = async (input, context) =>
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualNodes/{virtualNodeName}";
-    if (input.virtualNodeName !== undefined) {
-        const labelValue = input.virtualNodeName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualNodeName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualNodeName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualNodeName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualNodeName", () => input.virtualNodeName, "{virtualNodeName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7257,29 +7110,11 @@ const serializeAws_restJson1DeleteVirtualRouterCommand = async (input, context) 
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualRouters/{virtualRouterName}";
-    if (input.virtualRouterName !== undefined) {
-        const labelValue = input.virtualRouterName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualRouterName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualRouterName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualRouterName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualRouterName", () => input.virtualRouterName, "{virtualRouterName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7298,29 +7133,11 @@ const serializeAws_restJson1DeleteVirtualServiceCommand = async (input, context)
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualServices/{virtualServiceName}";
-    if (input.virtualServiceName !== undefined) {
-        const labelValue = input.virtualServiceName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualServiceName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualServiceName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualServiceName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualServiceName", () => input.virtualServiceName, "{virtualServiceName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7339,39 +7156,12 @@ const serializeAws_restJson1DescribeGatewayRouteCommand = async (input, context)
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualGateway/{virtualGatewayName}/gatewayRoutes/{gatewayRouteName}";
-    if (input.gatewayRouteName !== undefined) {
-        const labelValue = input.gatewayRouteName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: gatewayRouteName.");
-        }
-        resolvedPath = resolvedPath.replace("{gatewayRouteName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: gatewayRouteName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    if (input.virtualGatewayName !== undefined) {
-        const labelValue = input.virtualGatewayName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualGatewayName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualGatewayName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualGatewayName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "gatewayRouteName", () => input.gatewayRouteName, "{gatewayRouteName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualGatewayName", () => input.virtualGatewayName, "{virtualGatewayName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7389,19 +7179,10 @@ const serializeAws_restJson1DescribeMeshCommand = async (input, context) => {
     const { hostname, protocol = "https", port, path: basePath } = await context.endpoint();
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/v20190125/meshes/{meshName}";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7420,39 +7201,12 @@ const serializeAws_restJson1DescribeRouteCommand = async (input, context) => {
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualRouter/{virtualRouterName}/routes/{routeName}";
-    if (input.routeName !== undefined) {
-        const labelValue = input.routeName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: routeName.");
-        }
-        resolvedPath = resolvedPath.replace("{routeName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: routeName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    if (input.virtualRouterName !== undefined) {
-        const labelValue = input.virtualRouterName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualRouterName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualRouterName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualRouterName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "routeName", () => input.routeName, "{routeName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualRouterName", () => input.virtualRouterName, "{virtualRouterName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7471,29 +7225,11 @@ const serializeAws_restJson1DescribeVirtualGatewayCommand = async (input, contex
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualGateways/{virtualGatewayName}";
-    if (input.virtualGatewayName !== undefined) {
-        const labelValue = input.virtualGatewayName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualGatewayName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualGatewayName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualGatewayName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualGatewayName", () => input.virtualGatewayName, "{virtualGatewayName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7512,29 +7248,11 @@ const serializeAws_restJson1DescribeVirtualNodeCommand = async (input, context) 
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualNodes/{virtualNodeName}";
-    if (input.virtualNodeName !== undefined) {
-        const labelValue = input.virtualNodeName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualNodeName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualNodeName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualNodeName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualNodeName", () => input.virtualNodeName, "{virtualNodeName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7553,29 +7271,11 @@ const serializeAws_restJson1DescribeVirtualRouterCommand = async (input, context
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualRouters/{virtualRouterName}";
-    if (input.virtualRouterName !== undefined) {
-        const labelValue = input.virtualRouterName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualRouterName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualRouterName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualRouterName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualRouterName", () => input.virtualRouterName, "{virtualRouterName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7594,29 +7294,11 @@ const serializeAws_restJson1DescribeVirtualServiceCommand = async (input, contex
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualServices/{virtualServiceName}";
-    if (input.virtualServiceName !== undefined) {
-        const labelValue = input.virtualServiceName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualServiceName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualServiceName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualServiceName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualServiceName", () => input.virtualServiceName, "{virtualServiceName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7635,31 +7317,13 @@ const serializeAws_restJson1ListGatewayRoutesCommand = async (input, context) =>
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualGateway/{virtualGatewayName}/gatewayRoutes";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    if (input.virtualGatewayName !== undefined) {
-        const labelValue = input.virtualGatewayName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualGatewayName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualGatewayName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualGatewayName.");
-    }
-    const query = {
-        ...(input.nextToken !== undefined && { nextToken: input.nextToken }),
-        ...(input.limit !== undefined && { limit: input.limit.toString() }),
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualGatewayName", () => input.virtualGatewayName, "{virtualGatewayName}", false);
+    const query = map({
+        nextToken: [, input.nextToken],
+        limit: [() => input.limit !== void 0, () => input.limit.toString()],
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7677,10 +7341,10 @@ const serializeAws_restJson1ListMeshesCommand = async (input, context) => {
     const { hostname, protocol = "https", port, path: basePath } = await context.endpoint();
     const headers = {};
     const resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/v20190125/meshes";
-    const query = {
-        ...(input.nextToken !== undefined && { nextToken: input.nextToken }),
-        ...(input.limit !== undefined && { limit: input.limit.toString() }),
-    };
+    const query = map({
+        nextToken: [, input.nextToken],
+        limit: [() => input.limit !== void 0, () => input.limit.toString()],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7699,31 +7363,13 @@ const serializeAws_restJson1ListRoutesCommand = async (input, context) => {
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualRouter/{virtualRouterName}/routes";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    if (input.virtualRouterName !== undefined) {
-        const labelValue = input.virtualRouterName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualRouterName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualRouterName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualRouterName.");
-    }
-    const query = {
-        ...(input.nextToken !== undefined && { nextToken: input.nextToken }),
-        ...(input.limit !== undefined && { limit: input.limit.toString() }),
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualRouterName", () => input.virtualRouterName, "{virtualRouterName}", false);
+    const query = map({
+        nextToken: [, input.nextToken],
+        limit: [() => input.limit !== void 0, () => input.limit.toString()],
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7741,11 +7387,11 @@ const serializeAws_restJson1ListTagsForResourceCommand = async (input, context) 
     const { hostname, protocol = "https", port, path: basePath } = await context.endpoint();
     const headers = {};
     const resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/v20190125/tags";
-    const query = {
-        ...(input.resourceArn !== undefined && { resourceArn: input.resourceArn }),
-        ...(input.nextToken !== undefined && { nextToken: input.nextToken }),
-        ...(input.limit !== undefined && { limit: input.limit.toString() }),
-    };
+    const query = map({
+        resourceArn: [, input.resourceArn],
+        nextToken: [, input.nextToken],
+        limit: [() => input.limit !== void 0, () => input.limit.toString()],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7764,21 +7410,12 @@ const serializeAws_restJson1ListVirtualGatewaysCommand = async (input, context) 
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualGateways";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.nextToken !== undefined && { nextToken: input.nextToken }),
-        ...(input.limit !== undefined && { limit: input.limit.toString() }),
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        nextToken: [, input.nextToken],
+        limit: [() => input.limit !== void 0, () => input.limit.toString()],
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7796,21 +7433,12 @@ const serializeAws_restJson1ListVirtualNodesCommand = async (input, context) => 
     const { hostname, protocol = "https", port, path: basePath } = await context.endpoint();
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/v20190125/meshes/{meshName}/virtualNodes";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.nextToken !== undefined && { nextToken: input.nextToken }),
-        ...(input.limit !== undefined && { limit: input.limit.toString() }),
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        nextToken: [, input.nextToken],
+        limit: [() => input.limit !== void 0, () => input.limit.toString()],
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7829,21 +7457,12 @@ const serializeAws_restJson1ListVirtualRoutersCommand = async (input, context) =
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualRouters";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.nextToken !== undefined && { nextToken: input.nextToken }),
-        ...(input.limit !== undefined && { limit: input.limit.toString() }),
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        nextToken: [, input.nextToken],
+        limit: [() => input.limit !== void 0, () => input.limit.toString()],
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7862,21 +7481,12 @@ const serializeAws_restJson1ListVirtualServicesCommand = async (input, context) 
     const headers = {};
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualServices";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.nextToken !== undefined && { nextToken: input.nextToken }),
-        ...(input.limit !== undefined && { limit: input.limit.toString() }),
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        nextToken: [, input.nextToken],
+        limit: [() => input.limit !== void 0, () => input.limit.toString()],
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -7896,9 +7506,9 @@ const serializeAws_restJson1TagResourceCommand = async (input, context) => {
         "content-type": "application/json",
     };
     const resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/v20190125/tag";
-    const query = {
-        ...(input.resourceArn !== undefined && { resourceArn: input.resourceArn }),
-    };
+    const query = map({
+        resourceArn: [, input.resourceArn],
+    });
     let body;
     body = JSON.stringify({
         ...(input.tags != null && { tags: serializeAws_restJson1TagList(input.tags, context) }),
@@ -7921,9 +7531,9 @@ const serializeAws_restJson1UntagResourceCommand = async (input, context) => {
         "content-type": "application/json",
     };
     const resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/v20190125/untag";
-    const query = {
-        ...(input.resourceArn !== undefined && { resourceArn: input.resourceArn }),
-    };
+    const query = map({
+        resourceArn: [, input.resourceArn],
+    });
     let body;
     body = JSON.stringify({
         ...(input.tagKeys != null && { tagKeys: serializeAws_restJson1TagKeyList(input.tagKeys, context) }),
@@ -7948,39 +7558,12 @@ const serializeAws_restJson1UpdateGatewayRouteCommand = async (input, context) =
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualGateway/{virtualGatewayName}/gatewayRoutes/{gatewayRouteName}";
-    if (input.gatewayRouteName !== undefined) {
-        const labelValue = input.gatewayRouteName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: gatewayRouteName.");
-        }
-        resolvedPath = resolvedPath.replace("{gatewayRouteName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: gatewayRouteName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    if (input.virtualGatewayName !== undefined) {
-        const labelValue = input.virtualGatewayName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualGatewayName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualGatewayName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualGatewayName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "gatewayRouteName", () => input.gatewayRouteName, "{gatewayRouteName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualGatewayName", () => input.virtualGatewayName, "{virtualGatewayName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -8005,16 +7588,7 @@ const serializeAws_restJson1UpdateMeshCommand = async (input, context) => {
         "content-type": "application/json",
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/v20190125/meshes/{meshName}";
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -8039,39 +7613,12 @@ const serializeAws_restJson1UpdateRouteCommand = async (input, context) => {
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualRouter/{virtualRouterName}/routes/{routeName}";
-    if (input.routeName !== undefined) {
-        const labelValue = input.routeName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: routeName.");
-        }
-        resolvedPath = resolvedPath.replace("{routeName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: routeName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    if (input.virtualRouterName !== undefined) {
-        const labelValue = input.virtualRouterName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualRouterName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualRouterName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualRouterName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "routeName", () => input.routeName, "{routeName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualRouterName", () => input.virtualRouterName, "{virtualRouterName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -8097,29 +7644,11 @@ const serializeAws_restJson1UpdateVirtualGatewayCommand = async (input, context)
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualGateways/{virtualGatewayName}";
-    if (input.virtualGatewayName !== undefined) {
-        const labelValue = input.virtualGatewayName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualGatewayName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualGatewayName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualGatewayName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualGatewayName", () => input.virtualGatewayName, "{virtualGatewayName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -8145,29 +7674,11 @@ const serializeAws_restJson1UpdateVirtualNodeCommand = async (input, context) =>
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualNodes/{virtualNodeName}";
-    if (input.virtualNodeName !== undefined) {
-        const labelValue = input.virtualNodeName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualNodeName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualNodeName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualNodeName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualNodeName", () => input.virtualNodeName, "{virtualNodeName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -8193,29 +7704,11 @@ const serializeAws_restJson1UpdateVirtualRouterCommand = async (input, context) 
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualRouters/{virtualRouterName}";
-    if (input.virtualRouterName !== undefined) {
-        const labelValue = input.virtualRouterName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualRouterName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualRouterName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualRouterName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualRouterName", () => input.virtualRouterName, "{virtualRouterName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -8241,29 +7734,11 @@ const serializeAws_restJson1UpdateVirtualServiceCommand = async (input, context)
     };
     let resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` +
         "/v20190125/meshes/{meshName}/virtualServices/{virtualServiceName}";
-    if (input.virtualServiceName !== undefined) {
-        const labelValue = input.virtualServiceName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: virtualServiceName.");
-        }
-        resolvedPath = resolvedPath.replace("{virtualServiceName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: virtualServiceName.");
-    }
-    if (input.meshName !== undefined) {
-        const labelValue = input.meshName;
-        if (labelValue.length <= 0) {
-            throw new Error("Empty value provided for input HTTP label: meshName.");
-        }
-        resolvedPath = resolvedPath.replace("{meshName}", (0, smithy_client_1.extendedEncodeURIComponent)(labelValue));
-    }
-    else {
-        throw new Error("No value provided for input HTTP label: meshName.");
-    }
-    const query = {
-        ...(input.meshOwner !== undefined && { meshOwner: input.meshOwner }),
-    };
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "virtualServiceName", () => input.virtualServiceName, "{virtualServiceName}", false);
+    resolvedPath = (0, smithy_client_1.resolvedPath)(resolvedPath, input, "meshName", () => input.meshName, "{meshName}", false);
+    const query = map({
+        meshOwner: [, input.meshOwner],
+    });
     let body;
     body = JSON.stringify({
         clientToken: (_a = input.clientToken) !== null && _a !== void 0 ? _a : (0, uuid_1.v4)(),
@@ -8285,13 +7760,12 @@ const deserializeAws_restJson1CreateGatewayRouteCommand = async (output, context
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1CreateGatewayRouteCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        gatewayRoute: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.gatewayRoute = deserializeAws_restJson1GatewayRouteData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1CreateGatewayRouteCommand = deserializeAws_restJson1CreateGatewayRouteCommand;
 const deserializeAws_restJson1CreateGatewayRouteCommandError = async (output, context) => {
@@ -8299,7 +7773,6 @@ const deserializeAws_restJson1CreateGatewayRouteCommandError = async (output, co
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8328,27 +7801,24 @@ const deserializeAws_restJson1CreateGatewayRouteCommandError = async (output, co
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1CreateMeshCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1CreateMeshCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        mesh: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.mesh = deserializeAws_restJson1MeshData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1CreateMeshCommand = deserializeAws_restJson1CreateMeshCommand;
 const deserializeAws_restJson1CreateMeshCommandError = async (output, context) => {
@@ -8356,7 +7826,6 @@ const deserializeAws_restJson1CreateMeshCommandError = async (output, context) =
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8385,27 +7854,24 @@ const deserializeAws_restJson1CreateMeshCommandError = async (output, context) =
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1CreateRouteCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1CreateRouteCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        route: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.route = deserializeAws_restJson1RouteData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1CreateRouteCommand = deserializeAws_restJson1CreateRouteCommand;
 const deserializeAws_restJson1CreateRouteCommandError = async (output, context) => {
@@ -8413,7 +7879,6 @@ const deserializeAws_restJson1CreateRouteCommandError = async (output, context) 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8442,27 +7907,24 @@ const deserializeAws_restJson1CreateRouteCommandError = async (output, context) 
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1CreateVirtualGatewayCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1CreateVirtualGatewayCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualGateway: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualGateway = deserializeAws_restJson1VirtualGatewayData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1CreateVirtualGatewayCommand = deserializeAws_restJson1CreateVirtualGatewayCommand;
 const deserializeAws_restJson1CreateVirtualGatewayCommandError = async (output, context) => {
@@ -8470,7 +7932,6 @@ const deserializeAws_restJson1CreateVirtualGatewayCommandError = async (output, 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8499,27 +7960,24 @@ const deserializeAws_restJson1CreateVirtualGatewayCommandError = async (output, 
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1CreateVirtualNodeCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1CreateVirtualNodeCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualNode: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualNode = deserializeAws_restJson1VirtualNodeData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1CreateVirtualNodeCommand = deserializeAws_restJson1CreateVirtualNodeCommand;
 const deserializeAws_restJson1CreateVirtualNodeCommandError = async (output, context) => {
@@ -8527,7 +7985,6 @@ const deserializeAws_restJson1CreateVirtualNodeCommandError = async (output, con
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8556,27 +8013,24 @@ const deserializeAws_restJson1CreateVirtualNodeCommandError = async (output, con
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1CreateVirtualRouterCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1CreateVirtualRouterCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualRouter: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualRouter = deserializeAws_restJson1VirtualRouterData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1CreateVirtualRouterCommand = deserializeAws_restJson1CreateVirtualRouterCommand;
 const deserializeAws_restJson1CreateVirtualRouterCommandError = async (output, context) => {
@@ -8584,7 +8038,6 @@ const deserializeAws_restJson1CreateVirtualRouterCommandError = async (output, c
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8613,27 +8066,24 @@ const deserializeAws_restJson1CreateVirtualRouterCommandError = async (output, c
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1CreateVirtualServiceCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1CreateVirtualServiceCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualService: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualService = deserializeAws_restJson1VirtualServiceData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1CreateVirtualServiceCommand = deserializeAws_restJson1CreateVirtualServiceCommand;
 const deserializeAws_restJson1CreateVirtualServiceCommandError = async (output, context) => {
@@ -8641,7 +8091,6 @@ const deserializeAws_restJson1CreateVirtualServiceCommandError = async (output, 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8670,27 +8119,24 @@ const deserializeAws_restJson1CreateVirtualServiceCommandError = async (output, 
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DeleteGatewayRouteCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DeleteGatewayRouteCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        gatewayRoute: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.gatewayRoute = deserializeAws_restJson1GatewayRouteData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DeleteGatewayRouteCommand = deserializeAws_restJson1DeleteGatewayRouteCommand;
 const deserializeAws_restJson1DeleteGatewayRouteCommandError = async (output, context) => {
@@ -8698,7 +8144,6 @@ const deserializeAws_restJson1DeleteGatewayRouteCommandError = async (output, co
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8724,27 +8169,24 @@ const deserializeAws_restJson1DeleteGatewayRouteCommandError = async (output, co
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DeleteMeshCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DeleteMeshCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        mesh: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.mesh = deserializeAws_restJson1MeshData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DeleteMeshCommand = deserializeAws_restJson1DeleteMeshCommand;
 const deserializeAws_restJson1DeleteMeshCommandError = async (output, context) => {
@@ -8752,7 +8194,6 @@ const deserializeAws_restJson1DeleteMeshCommandError = async (output, context) =
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8778,27 +8219,24 @@ const deserializeAws_restJson1DeleteMeshCommandError = async (output, context) =
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DeleteRouteCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DeleteRouteCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        route: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.route = deserializeAws_restJson1RouteData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DeleteRouteCommand = deserializeAws_restJson1DeleteRouteCommand;
 const deserializeAws_restJson1DeleteRouteCommandError = async (output, context) => {
@@ -8806,7 +8244,6 @@ const deserializeAws_restJson1DeleteRouteCommandError = async (output, context) 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8832,27 +8269,24 @@ const deserializeAws_restJson1DeleteRouteCommandError = async (output, context) 
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DeleteVirtualGatewayCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DeleteVirtualGatewayCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualGateway: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualGateway = deserializeAws_restJson1VirtualGatewayData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DeleteVirtualGatewayCommand = deserializeAws_restJson1DeleteVirtualGatewayCommand;
 const deserializeAws_restJson1DeleteVirtualGatewayCommandError = async (output, context) => {
@@ -8860,7 +8294,6 @@ const deserializeAws_restJson1DeleteVirtualGatewayCommandError = async (output, 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8886,27 +8319,24 @@ const deserializeAws_restJson1DeleteVirtualGatewayCommandError = async (output, 
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DeleteVirtualNodeCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DeleteVirtualNodeCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualNode: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualNode = deserializeAws_restJson1VirtualNodeData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DeleteVirtualNodeCommand = deserializeAws_restJson1DeleteVirtualNodeCommand;
 const deserializeAws_restJson1DeleteVirtualNodeCommandError = async (output, context) => {
@@ -8914,7 +8344,6 @@ const deserializeAws_restJson1DeleteVirtualNodeCommandError = async (output, con
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8940,27 +8369,24 @@ const deserializeAws_restJson1DeleteVirtualNodeCommandError = async (output, con
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DeleteVirtualRouterCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DeleteVirtualRouterCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualRouter: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualRouter = deserializeAws_restJson1VirtualRouterData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DeleteVirtualRouterCommand = deserializeAws_restJson1DeleteVirtualRouterCommand;
 const deserializeAws_restJson1DeleteVirtualRouterCommandError = async (output, context) => {
@@ -8968,7 +8394,6 @@ const deserializeAws_restJson1DeleteVirtualRouterCommandError = async (output, c
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -8994,27 +8419,24 @@ const deserializeAws_restJson1DeleteVirtualRouterCommandError = async (output, c
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DeleteVirtualServiceCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DeleteVirtualServiceCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualService: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualService = deserializeAws_restJson1VirtualServiceData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DeleteVirtualServiceCommand = deserializeAws_restJson1DeleteVirtualServiceCommand;
 const deserializeAws_restJson1DeleteVirtualServiceCommandError = async (output, context) => {
@@ -9022,7 +8444,6 @@ const deserializeAws_restJson1DeleteVirtualServiceCommandError = async (output, 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9048,27 +8469,24 @@ const deserializeAws_restJson1DeleteVirtualServiceCommandError = async (output, 
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DescribeGatewayRouteCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DescribeGatewayRouteCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        gatewayRoute: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.gatewayRoute = deserializeAws_restJson1GatewayRouteData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DescribeGatewayRouteCommand = deserializeAws_restJson1DescribeGatewayRouteCommand;
 const deserializeAws_restJson1DescribeGatewayRouteCommandError = async (output, context) => {
@@ -9076,7 +8494,6 @@ const deserializeAws_restJson1DescribeGatewayRouteCommandError = async (output, 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9099,27 +8516,24 @@ const deserializeAws_restJson1DescribeGatewayRouteCommandError = async (output, 
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DescribeMeshCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DescribeMeshCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        mesh: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.mesh = deserializeAws_restJson1MeshData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DescribeMeshCommand = deserializeAws_restJson1DescribeMeshCommand;
 const deserializeAws_restJson1DescribeMeshCommandError = async (output, context) => {
@@ -9127,7 +8541,6 @@ const deserializeAws_restJson1DescribeMeshCommandError = async (output, context)
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9150,27 +8563,24 @@ const deserializeAws_restJson1DescribeMeshCommandError = async (output, context)
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DescribeRouteCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DescribeRouteCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        route: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.route = deserializeAws_restJson1RouteData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DescribeRouteCommand = deserializeAws_restJson1DescribeRouteCommand;
 const deserializeAws_restJson1DescribeRouteCommandError = async (output, context) => {
@@ -9178,7 +8588,6 @@ const deserializeAws_restJson1DescribeRouteCommandError = async (output, context
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9201,27 +8610,24 @@ const deserializeAws_restJson1DescribeRouteCommandError = async (output, context
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DescribeVirtualGatewayCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DescribeVirtualGatewayCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualGateway: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualGateway = deserializeAws_restJson1VirtualGatewayData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DescribeVirtualGatewayCommand = deserializeAws_restJson1DescribeVirtualGatewayCommand;
 const deserializeAws_restJson1DescribeVirtualGatewayCommandError = async (output, context) => {
@@ -9229,7 +8635,6 @@ const deserializeAws_restJson1DescribeVirtualGatewayCommandError = async (output
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9252,27 +8657,24 @@ const deserializeAws_restJson1DescribeVirtualGatewayCommandError = async (output
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DescribeVirtualNodeCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DescribeVirtualNodeCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualNode: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualNode = deserializeAws_restJson1VirtualNodeData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DescribeVirtualNodeCommand = deserializeAws_restJson1DescribeVirtualNodeCommand;
 const deserializeAws_restJson1DescribeVirtualNodeCommandError = async (output, context) => {
@@ -9280,7 +8682,6 @@ const deserializeAws_restJson1DescribeVirtualNodeCommandError = async (output, c
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9303,27 +8704,24 @@ const deserializeAws_restJson1DescribeVirtualNodeCommandError = async (output, c
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DescribeVirtualRouterCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DescribeVirtualRouterCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualRouter: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualRouter = deserializeAws_restJson1VirtualRouterData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DescribeVirtualRouterCommand = deserializeAws_restJson1DescribeVirtualRouterCommand;
 const deserializeAws_restJson1DescribeVirtualRouterCommandError = async (output, context) => {
@@ -9331,7 +8729,6 @@ const deserializeAws_restJson1DescribeVirtualRouterCommandError = async (output,
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9354,27 +8751,24 @@ const deserializeAws_restJson1DescribeVirtualRouterCommandError = async (output,
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1DescribeVirtualServiceCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1DescribeVirtualServiceCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualService: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualService = deserializeAws_restJson1VirtualServiceData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1DescribeVirtualServiceCommand = deserializeAws_restJson1DescribeVirtualServiceCommand;
 const deserializeAws_restJson1DescribeVirtualServiceCommandError = async (output, context) => {
@@ -9382,7 +8776,6 @@ const deserializeAws_restJson1DescribeVirtualServiceCommandError = async (output
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9405,33 +8798,29 @@ const deserializeAws_restJson1DescribeVirtualServiceCommandError = async (output
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1ListGatewayRoutesCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1ListGatewayRoutesCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        gatewayRoutes: undefined,
-        nextToken: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.gatewayRoutes !== undefined && data.gatewayRoutes !== null) {
+    if (data.gatewayRoutes != null) {
         contents.gatewayRoutes = deserializeAws_restJson1GatewayRouteList(data.gatewayRoutes, context);
     }
-    if (data.nextToken !== undefined && data.nextToken !== null) {
+    if (data.nextToken != null) {
         contents.nextToken = (0, smithy_client_1.expectString)(data.nextToken);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1ListGatewayRoutesCommand = deserializeAws_restJson1ListGatewayRoutesCommand;
 const deserializeAws_restJson1ListGatewayRoutesCommandError = async (output, context) => {
@@ -9439,7 +8828,6 @@ const deserializeAws_restJson1ListGatewayRoutesCommandError = async (output, con
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9462,33 +8850,29 @@ const deserializeAws_restJson1ListGatewayRoutesCommandError = async (output, con
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1ListMeshesCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1ListMeshesCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        meshes: undefined,
-        nextToken: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.meshes !== undefined && data.meshes !== null) {
+    if (data.meshes != null) {
         contents.meshes = deserializeAws_restJson1MeshList(data.meshes, context);
     }
-    if (data.nextToken !== undefined && data.nextToken !== null) {
+    if (data.nextToken != null) {
         contents.nextToken = (0, smithy_client_1.expectString)(data.nextToken);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1ListMeshesCommand = deserializeAws_restJson1ListMeshesCommand;
 const deserializeAws_restJson1ListMeshesCommandError = async (output, context) => {
@@ -9496,7 +8880,6 @@ const deserializeAws_restJson1ListMeshesCommandError = async (output, context) =
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9519,33 +8902,29 @@ const deserializeAws_restJson1ListMeshesCommandError = async (output, context) =
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1ListRoutesCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1ListRoutesCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        nextToken: undefined,
-        routes: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.nextToken !== undefined && data.nextToken !== null) {
+    if (data.nextToken != null) {
         contents.nextToken = (0, smithy_client_1.expectString)(data.nextToken);
     }
-    if (data.routes !== undefined && data.routes !== null) {
+    if (data.routes != null) {
         contents.routes = deserializeAws_restJson1RouteList(data.routes, context);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1ListRoutesCommand = deserializeAws_restJson1ListRoutesCommand;
 const deserializeAws_restJson1ListRoutesCommandError = async (output, context) => {
@@ -9553,7 +8932,6 @@ const deserializeAws_restJson1ListRoutesCommandError = async (output, context) =
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9576,33 +8954,29 @@ const deserializeAws_restJson1ListRoutesCommandError = async (output, context) =
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1ListTagsForResourceCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1ListTagsForResourceCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        nextToken: undefined,
-        tags: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.nextToken !== undefined && data.nextToken !== null) {
+    if (data.nextToken != null) {
         contents.nextToken = (0, smithy_client_1.expectString)(data.nextToken);
     }
-    if (data.tags !== undefined && data.tags !== null) {
+    if (data.tags != null) {
         contents.tags = deserializeAws_restJson1TagList(data.tags, context);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1ListTagsForResourceCommand = deserializeAws_restJson1ListTagsForResourceCommand;
 const deserializeAws_restJson1ListTagsForResourceCommandError = async (output, context) => {
@@ -9610,7 +8984,6 @@ const deserializeAws_restJson1ListTagsForResourceCommandError = async (output, c
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9633,33 +9006,29 @@ const deserializeAws_restJson1ListTagsForResourceCommandError = async (output, c
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1ListVirtualGatewaysCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1ListVirtualGatewaysCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        nextToken: undefined,
-        virtualGateways: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.nextToken !== undefined && data.nextToken !== null) {
+    if (data.nextToken != null) {
         contents.nextToken = (0, smithy_client_1.expectString)(data.nextToken);
     }
-    if (data.virtualGateways !== undefined && data.virtualGateways !== null) {
+    if (data.virtualGateways != null) {
         contents.virtualGateways = deserializeAws_restJson1VirtualGatewayList(data.virtualGateways, context);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1ListVirtualGatewaysCommand = deserializeAws_restJson1ListVirtualGatewaysCommand;
 const deserializeAws_restJson1ListVirtualGatewaysCommandError = async (output, context) => {
@@ -9667,7 +9036,6 @@ const deserializeAws_restJson1ListVirtualGatewaysCommandError = async (output, c
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9690,33 +9058,29 @@ const deserializeAws_restJson1ListVirtualGatewaysCommandError = async (output, c
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1ListVirtualNodesCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1ListVirtualNodesCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        nextToken: undefined,
-        virtualNodes: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.nextToken !== undefined && data.nextToken !== null) {
+    if (data.nextToken != null) {
         contents.nextToken = (0, smithy_client_1.expectString)(data.nextToken);
     }
-    if (data.virtualNodes !== undefined && data.virtualNodes !== null) {
+    if (data.virtualNodes != null) {
         contents.virtualNodes = deserializeAws_restJson1VirtualNodeList(data.virtualNodes, context);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1ListVirtualNodesCommand = deserializeAws_restJson1ListVirtualNodesCommand;
 const deserializeAws_restJson1ListVirtualNodesCommandError = async (output, context) => {
@@ -9724,7 +9088,6 @@ const deserializeAws_restJson1ListVirtualNodesCommandError = async (output, cont
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9747,33 +9110,29 @@ const deserializeAws_restJson1ListVirtualNodesCommandError = async (output, cont
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1ListVirtualRoutersCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1ListVirtualRoutersCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        nextToken: undefined,
-        virtualRouters: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.nextToken !== undefined && data.nextToken !== null) {
+    if (data.nextToken != null) {
         contents.nextToken = (0, smithy_client_1.expectString)(data.nextToken);
     }
-    if (data.virtualRouters !== undefined && data.virtualRouters !== null) {
+    if (data.virtualRouters != null) {
         contents.virtualRouters = deserializeAws_restJson1VirtualRouterList(data.virtualRouters, context);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1ListVirtualRoutersCommand = deserializeAws_restJson1ListVirtualRoutersCommand;
 const deserializeAws_restJson1ListVirtualRoutersCommandError = async (output, context) => {
@@ -9781,7 +9140,6 @@ const deserializeAws_restJson1ListVirtualRoutersCommandError = async (output, co
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9804,33 +9162,29 @@ const deserializeAws_restJson1ListVirtualRoutersCommandError = async (output, co
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1ListVirtualServicesCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1ListVirtualServicesCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        nextToken: undefined,
-        virtualServices: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.nextToken !== undefined && data.nextToken !== null) {
+    if (data.nextToken != null) {
         contents.nextToken = (0, smithy_client_1.expectString)(data.nextToken);
     }
-    if (data.virtualServices !== undefined && data.virtualServices !== null) {
+    if (data.virtualServices != null) {
         contents.virtualServices = deserializeAws_restJson1VirtualServiceList(data.virtualServices, context);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1ListVirtualServicesCommand = deserializeAws_restJson1ListVirtualServicesCommand;
 const deserializeAws_restJson1ListVirtualServicesCommandError = async (output, context) => {
@@ -9838,7 +9192,6 @@ const deserializeAws_restJson1ListVirtualServicesCommandError = async (output, c
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9861,25 +9214,23 @@ const deserializeAws_restJson1ListVirtualServicesCommandError = async (output, c
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1TagResourceCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1TagResourceCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-    };
+    });
     await collectBody(output.body, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1TagResourceCommand = deserializeAws_restJson1TagResourceCommand;
 const deserializeAws_restJson1TagResourceCommandError = async (output, context) => {
@@ -9887,7 +9238,6 @@ const deserializeAws_restJson1TagResourceCommandError = async (output, context) 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9913,25 +9263,23 @@ const deserializeAws_restJson1TagResourceCommandError = async (output, context) 
             throw await deserializeAws_restJson1TooManyTagsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1UntagResourceCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1UntagResourceCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-    };
+    });
     await collectBody(output.body, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1UntagResourceCommand = deserializeAws_restJson1UntagResourceCommand;
 const deserializeAws_restJson1UntagResourceCommandError = async (output, context) => {
@@ -9939,7 +9287,6 @@ const deserializeAws_restJson1UntagResourceCommandError = async (output, context
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -9962,27 +9309,24 @@ const deserializeAws_restJson1UntagResourceCommandError = async (output, context
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1UpdateGatewayRouteCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1UpdateGatewayRouteCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        gatewayRoute: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.gatewayRoute = deserializeAws_restJson1GatewayRouteData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1UpdateGatewayRouteCommand = deserializeAws_restJson1UpdateGatewayRouteCommand;
 const deserializeAws_restJson1UpdateGatewayRouteCommandError = async (output, context) => {
@@ -9990,7 +9334,6 @@ const deserializeAws_restJson1UpdateGatewayRouteCommandError = async (output, co
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -10019,27 +9362,24 @@ const deserializeAws_restJson1UpdateGatewayRouteCommandError = async (output, co
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1UpdateMeshCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1UpdateMeshCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        mesh: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.mesh = deserializeAws_restJson1MeshData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1UpdateMeshCommand = deserializeAws_restJson1UpdateMeshCommand;
 const deserializeAws_restJson1UpdateMeshCommandError = async (output, context) => {
@@ -10047,7 +9387,6 @@ const deserializeAws_restJson1UpdateMeshCommandError = async (output, context) =
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -10073,27 +9412,24 @@ const deserializeAws_restJson1UpdateMeshCommandError = async (output, context) =
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1UpdateRouteCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1UpdateRouteCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        route: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.route = deserializeAws_restJson1RouteData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1UpdateRouteCommand = deserializeAws_restJson1UpdateRouteCommand;
 const deserializeAws_restJson1UpdateRouteCommandError = async (output, context) => {
@@ -10101,7 +9437,6 @@ const deserializeAws_restJson1UpdateRouteCommandError = async (output, context) 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -10130,27 +9465,24 @@ const deserializeAws_restJson1UpdateRouteCommandError = async (output, context) 
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1UpdateVirtualGatewayCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1UpdateVirtualGatewayCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualGateway: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualGateway = deserializeAws_restJson1VirtualGatewayData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1UpdateVirtualGatewayCommand = deserializeAws_restJson1UpdateVirtualGatewayCommand;
 const deserializeAws_restJson1UpdateVirtualGatewayCommandError = async (output, context) => {
@@ -10158,7 +9490,6 @@ const deserializeAws_restJson1UpdateVirtualGatewayCommandError = async (output, 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -10187,27 +9518,24 @@ const deserializeAws_restJson1UpdateVirtualGatewayCommandError = async (output, 
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1UpdateVirtualNodeCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1UpdateVirtualNodeCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualNode: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualNode = deserializeAws_restJson1VirtualNodeData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1UpdateVirtualNodeCommand = deserializeAws_restJson1UpdateVirtualNodeCommand;
 const deserializeAws_restJson1UpdateVirtualNodeCommandError = async (output, context) => {
@@ -10215,7 +9543,6 @@ const deserializeAws_restJson1UpdateVirtualNodeCommandError = async (output, con
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -10244,27 +9571,24 @@ const deserializeAws_restJson1UpdateVirtualNodeCommandError = async (output, con
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1UpdateVirtualRouterCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1UpdateVirtualRouterCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualRouter: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualRouter = deserializeAws_restJson1VirtualRouterData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1UpdateVirtualRouterCommand = deserializeAws_restJson1UpdateVirtualRouterCommand;
 const deserializeAws_restJson1UpdateVirtualRouterCommandError = async (output, context) => {
@@ -10272,7 +9596,6 @@ const deserializeAws_restJson1UpdateVirtualRouterCommandError = async (output, c
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -10301,27 +9624,24 @@ const deserializeAws_restJson1UpdateVirtualRouterCommandError = async (output, c
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1UpdateVirtualServiceCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1UpdateVirtualServiceCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        virtualService: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectObject)(await parseBody(output.body, context));
     contents.virtualService = deserializeAws_restJson1VirtualServiceData(data, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1UpdateVirtualServiceCommand = deserializeAws_restJson1UpdateVirtualServiceCommand;
 const deserializeAws_restJson1UpdateVirtualServiceCommandError = async (output, context) => {
@@ -10329,7 +9649,6 @@ const deserializeAws_restJson1UpdateVirtualServiceCommandError = async (output, 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "BadRequestException":
@@ -10358,20 +9677,19 @@ const deserializeAws_restJson1UpdateVirtualServiceCommandError = async (output, 
             throw await deserializeAws_restJson1TooManyRequestsExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new AppMeshServiceException_1.AppMeshServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: AppMeshServiceException_1.AppMeshServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
+const map = smithy_client_1.map;
 const deserializeAws_restJson1BadRequestExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.BadRequestException({
@@ -10381,9 +9699,9 @@ const deserializeAws_restJson1BadRequestExceptionResponse = async (parsedOutput,
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1ConflictExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.ConflictException({
@@ -10393,9 +9711,9 @@ const deserializeAws_restJson1ConflictExceptionResponse = async (parsedOutput, c
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1ForbiddenExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.ForbiddenException({
@@ -10405,9 +9723,9 @@ const deserializeAws_restJson1ForbiddenExceptionResponse = async (parsedOutput, 
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1InternalServerErrorExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.InternalServerErrorException({
@@ -10417,9 +9735,9 @@ const deserializeAws_restJson1InternalServerErrorExceptionResponse = async (pars
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1LimitExceededExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.LimitExceededException({
@@ -10429,9 +9747,9 @@ const deserializeAws_restJson1LimitExceededExceptionResponse = async (parsedOutp
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1NotFoundExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.NotFoundException({
@@ -10441,9 +9759,9 @@ const deserializeAws_restJson1NotFoundExceptionResponse = async (parsedOutput, c
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1ResourceInUseExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.ResourceInUseException({
@@ -10453,9 +9771,9 @@ const deserializeAws_restJson1ResourceInUseExceptionResponse = async (parsedOutp
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1ServiceUnavailableExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.ServiceUnavailableException({
@@ -10465,9 +9783,9 @@ const deserializeAws_restJson1ServiceUnavailableExceptionResponse = async (parse
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1TooManyRequestsExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.TooManyRequestsException({
@@ -10477,9 +9795,9 @@ const deserializeAws_restJson1TooManyRequestsExceptionResponse = async (parsedOu
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1TooManyTagsExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.TooManyTagsException({
@@ -10504,9 +9822,6 @@ const serializeAws_restJson1AwsCloudMapInstanceAttributes = (input, context) => 
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1AwsCloudMapInstanceAttribute(entry, context);
     });
 };
@@ -10537,9 +9852,6 @@ const serializeAws_restJson1Backends = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1Backend(entry, context);
     });
 };
@@ -10547,9 +9859,6 @@ const serializeAws_restJson1CertificateAuthorityArns = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return entry;
     });
 };
@@ -10665,9 +9974,6 @@ const serializeAws_restJson1GrpcGatewayRouteMetadataList = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1GrpcGatewayRouteMetadata(entry, context);
     });
 };
@@ -10709,9 +10015,6 @@ const serializeAws_restJson1GrpcRetryPolicyEvents = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return entry;
     });
 };
@@ -10750,9 +10053,6 @@ const serializeAws_restJson1GrpcRouteMetadataList = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1GrpcRouteMetadata(entry, context);
     });
 };
@@ -10816,9 +10116,6 @@ const serializeAws_restJson1HttpGatewayRouteHeaders = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1HttpGatewayRouteHeader(entry, context);
     });
 };
@@ -10872,9 +10169,6 @@ const serializeAws_restJson1HttpQueryParameters = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1HttpQueryParameter(entry, context);
     });
 };
@@ -10896,9 +10190,6 @@ const serializeAws_restJson1HttpRetryPolicyEvents = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return entry;
     });
 };
@@ -10930,9 +10221,6 @@ const serializeAws_restJson1HttpRouteHeaders = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1HttpRouteHeader(entry, context);
     });
 };
@@ -10974,9 +10262,6 @@ const serializeAws_restJson1Listeners = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1Listener(entry, context);
     });
 };
@@ -11087,9 +10372,6 @@ const serializeAws_restJson1PortSet = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return entry;
     });
 };
@@ -11118,9 +10400,6 @@ const serializeAws_restJson1SubjectAlternativeNameList = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return entry;
     });
 };
@@ -11138,9 +10417,6 @@ const serializeAws_restJson1TagKeyList = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return entry;
     });
 };
@@ -11148,9 +10424,6 @@ const serializeAws_restJson1TagList = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1TagRef(entry, context);
     });
 };
@@ -11164,9 +10437,6 @@ const serializeAws_restJson1TcpRetryPolicyEvents = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return entry;
     });
 };
@@ -11238,9 +10508,6 @@ const serializeAws_restJson1VirtualGatewayCertificateAuthorityArns = (input, con
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return entry;
     });
 };
@@ -11326,9 +10593,6 @@ const serializeAws_restJson1VirtualGatewayListeners = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1VirtualGatewayListener(entry, context);
     });
 };
@@ -11500,9 +10764,6 @@ const serializeAws_restJson1VirtualRouterListeners = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1VirtualRouterListener(entry, context);
     });
 };
@@ -11548,14 +10809,11 @@ const serializeAws_restJson1WeightedTargets = (input, context) => {
     return input
         .filter((e) => e != null)
         .map((entry) => {
-        if (entry === null) {
-            return null;
-        }
         return serializeAws_restJson1WeightedTarget(entry, context);
     });
 };
 const deserializeAws_restJson1AccessLog = (output, context) => {
-    if (output.file !== undefined && output.file !== null) {
+    if (output.file != null) {
         return {
             file: deserializeAws_restJson1FileAccessLog(output.file, context),
         };
@@ -11590,7 +10848,7 @@ const deserializeAws_restJson1AwsCloudMapServiceDiscovery = (output, context) =>
     };
 };
 const deserializeAws_restJson1Backend = (output, context) => {
-    if (output.virtualService !== undefined && output.virtualService !== null) {
+    if (output.virtualService != null) {
         return {
             virtualService: deserializeAws_restJson1VirtualServiceBackend(output.virtualService, context),
         };
@@ -11640,12 +10898,12 @@ const deserializeAws_restJson1ClientPolicyTls = (output, context) => {
     };
 };
 const deserializeAws_restJson1ClientTlsCertificate = (output, context) => {
-    if (output.file !== undefined && output.file !== null) {
+    if (output.file != null) {
         return {
             file: deserializeAws_restJson1ListenerTlsFileCertificate(output.file, context),
         };
     }
-    if (output.sds !== undefined && output.sds !== null) {
+    if (output.sds != null) {
         return {
             sds: deserializeAws_restJson1ListenerTlsSdsCertificate(output.sds, context),
         };
@@ -11802,7 +11060,7 @@ const deserializeAws_restJson1GrpcMetadataMatchMethod = (output, context) => {
     if ((0, smithy_client_1.expectString)(output.prefix) !== undefined) {
         return { prefix: (0, smithy_client_1.expectString)(output.prefix) };
     }
-    if (output.range !== undefined && output.range !== null) {
+    if (output.range != null) {
         return {
             range: deserializeAws_restJson1MatchRange(output.range, context),
         };
@@ -11890,7 +11148,7 @@ const deserializeAws_restJson1GrpcRouteMetadataMatchMethod = (output, context) =
     if ((0, smithy_client_1.expectString)(output.prefix) !== undefined) {
         return { prefix: (0, smithy_client_1.expectString)(output.prefix) };
     }
-    if (output.range !== undefined && output.range !== null) {
+    if (output.range != null) {
         return {
             range: deserializeAws_restJson1MatchRange(output.range, context),
         };
@@ -11916,7 +11174,7 @@ const deserializeAws_restJson1HeaderMatchMethod = (output, context) => {
     if ((0, smithy_client_1.expectString)(output.prefix) !== undefined) {
         return { prefix: (0, smithy_client_1.expectString)(output.prefix) };
     }
-    if (output.range !== undefined && output.range !== null) {
+    if (output.range != null) {
         return {
             range: deserializeAws_restJson1MatchRange(output.range, context),
         };
@@ -12131,22 +11389,22 @@ const deserializeAws_restJson1Listeners = (output, context) => {
     return retVal;
 };
 const deserializeAws_restJson1ListenerTimeout = (output, context) => {
-    if (output.grpc !== undefined && output.grpc !== null) {
+    if (output.grpc != null) {
         return {
             grpc: deserializeAws_restJson1GrpcTimeout(output.grpc, context),
         };
     }
-    if (output.http !== undefined && output.http !== null) {
+    if (output.http != null) {
         return {
             http: deserializeAws_restJson1HttpTimeout(output.http, context),
         };
     }
-    if (output.http2 !== undefined && output.http2 !== null) {
+    if (output.http2 != null) {
         return {
             http2: deserializeAws_restJson1HttpTimeout(output.http2, context),
         };
     }
-    if (output.tcp !== undefined && output.tcp !== null) {
+    if (output.tcp != null) {
         return {
             tcp: deserializeAws_restJson1TcpTimeout(output.tcp, context),
         };
@@ -12170,17 +11428,17 @@ const deserializeAws_restJson1ListenerTlsAcmCertificate = (output, context) => {
     };
 };
 const deserializeAws_restJson1ListenerTlsCertificate = (output, context) => {
-    if (output.acm !== undefined && output.acm !== null) {
+    if (output.acm != null) {
         return {
             acm: deserializeAws_restJson1ListenerTlsAcmCertificate(output.acm, context),
         };
     }
-    if (output.file !== undefined && output.file !== null) {
+    if (output.file != null) {
         return {
             file: deserializeAws_restJson1ListenerTlsFileCertificate(output.file, context),
         };
     }
-    if (output.sds !== undefined && output.sds !== null) {
+    if (output.sds != null) {
         return {
             sds: deserializeAws_restJson1ListenerTlsSdsCertificate(output.sds, context),
         };
@@ -12209,12 +11467,12 @@ const deserializeAws_restJson1ListenerTlsValidationContext = (output, context) =
     };
 };
 const deserializeAws_restJson1ListenerTlsValidationContextTrust = (output, context) => {
-    if (output.file !== undefined && output.file !== null) {
+    if (output.file != null) {
         return {
             file: deserializeAws_restJson1TlsValidationContextFileTrust(output.file, context),
         };
     }
-    if (output.sds !== undefined && output.sds !== null) {
+    if (output.sds != null) {
         return {
             sds: deserializeAws_restJson1TlsValidationContextSdsTrust(output.sds, context),
         };
@@ -12380,12 +11638,12 @@ const deserializeAws_restJson1RouteStatus = (output, context) => {
     };
 };
 const deserializeAws_restJson1ServiceDiscovery = (output, context) => {
-    if (output.awsCloudMap !== undefined && output.awsCloudMap !== null) {
+    if (output.awsCloudMap != null) {
         return {
             awsCloudMap: deserializeAws_restJson1AwsCloudMapServiceDiscovery(output.awsCloudMap, context),
         };
     }
-    if (output.dns !== undefined && output.dns !== null) {
+    if (output.dns != null) {
         return {
             dns: deserializeAws_restJson1DnsServiceDiscovery(output.dns, context),
         };
@@ -12487,17 +11745,17 @@ const deserializeAws_restJson1TlsValidationContextSdsTrust = (output, context) =
     };
 };
 const deserializeAws_restJson1TlsValidationContextTrust = (output, context) => {
-    if (output.acm !== undefined && output.acm !== null) {
+    if (output.acm != null) {
         return {
             acm: deserializeAws_restJson1TlsValidationContextAcmTrust(output.acm, context),
         };
     }
-    if (output.file !== undefined && output.file !== null) {
+    if (output.file != null) {
         return {
             file: deserializeAws_restJson1TlsValidationContextFileTrust(output.file, context),
         };
     }
-    if (output.sds !== undefined && output.sds !== null) {
+    if (output.sds != null) {
         return {
             sds: deserializeAws_restJson1TlsValidationContextSdsTrust(output.sds, context),
         };
@@ -12505,7 +11763,7 @@ const deserializeAws_restJson1TlsValidationContextTrust = (output, context) => {
     return { $unknown: Object.entries(output)[0] };
 };
 const deserializeAws_restJson1VirtualGatewayAccessLog = (output, context) => {
-    if (output.file !== undefined && output.file !== null) {
+    if (output.file != null) {
         return {
             file: deserializeAws_restJson1VirtualGatewayFileAccessLog(output.file, context),
         };
@@ -12548,12 +11806,12 @@ const deserializeAws_restJson1VirtualGatewayClientPolicyTls = (output, context) 
     };
 };
 const deserializeAws_restJson1VirtualGatewayClientTlsCertificate = (output, context) => {
-    if (output.file !== undefined && output.file !== null) {
+    if (output.file != null) {
         return {
             file: deserializeAws_restJson1VirtualGatewayListenerTlsFileCertificate(output.file, context),
         };
     }
-    if (output.sds !== undefined && output.sds !== null) {
+    if (output.sds != null) {
         return {
             sds: deserializeAws_restJson1VirtualGatewayListenerTlsSdsCertificate(output.sds, context),
         };
@@ -12561,17 +11819,17 @@ const deserializeAws_restJson1VirtualGatewayClientTlsCertificate = (output, cont
     return { $unknown: Object.entries(output)[0] };
 };
 const deserializeAws_restJson1VirtualGatewayConnectionPool = (output, context) => {
-    if (output.grpc !== undefined && output.grpc !== null) {
+    if (output.grpc != null) {
         return {
             grpc: deserializeAws_restJson1VirtualGatewayGrpcConnectionPool(output.grpc, context),
         };
     }
-    if (output.http !== undefined && output.http !== null) {
+    if (output.http != null) {
         return {
             http: deserializeAws_restJson1VirtualGatewayHttpConnectionPool(output.http, context),
         };
     }
-    if (output.http2 !== undefined && output.http2 !== null) {
+    if (output.http2 != null) {
         return {
             http2: deserializeAws_restJson1VirtualGatewayHttp2ConnectionPool(output.http2, context),
         };
@@ -12672,17 +11930,17 @@ const deserializeAws_restJson1VirtualGatewayListenerTlsAcmCertificate = (output,
     };
 };
 const deserializeAws_restJson1VirtualGatewayListenerTlsCertificate = (output, context) => {
-    if (output.acm !== undefined && output.acm !== null) {
+    if (output.acm != null) {
         return {
             acm: deserializeAws_restJson1VirtualGatewayListenerTlsAcmCertificate(output.acm, context),
         };
     }
-    if (output.file !== undefined && output.file !== null) {
+    if (output.file != null) {
         return {
             file: deserializeAws_restJson1VirtualGatewayListenerTlsFileCertificate(output.file, context),
         };
     }
-    if (output.sds !== undefined && output.sds !== null) {
+    if (output.sds != null) {
         return {
             sds: deserializeAws_restJson1VirtualGatewayListenerTlsSdsCertificate(output.sds, context),
         };
@@ -12711,12 +11969,12 @@ const deserializeAws_restJson1VirtualGatewayListenerTlsValidationContext = (outp
     };
 };
 const deserializeAws_restJson1VirtualGatewayListenerTlsValidationContextTrust = (output, context) => {
-    if (output.file !== undefined && output.file !== null) {
+    if (output.file != null) {
         return {
             file: deserializeAws_restJson1VirtualGatewayTlsValidationContextFileTrust(output.file, context),
         };
     }
-    if (output.sds !== undefined && output.sds !== null) {
+    if (output.sds != null) {
         return {
             sds: deserializeAws_restJson1VirtualGatewayTlsValidationContextSdsTrust(output.sds, context),
         };
@@ -12792,17 +12050,17 @@ const deserializeAws_restJson1VirtualGatewayTlsValidationContextSdsTrust = (outp
     };
 };
 const deserializeAws_restJson1VirtualGatewayTlsValidationContextTrust = (output, context) => {
-    if (output.acm !== undefined && output.acm !== null) {
+    if (output.acm != null) {
         return {
             acm: deserializeAws_restJson1VirtualGatewayTlsValidationContextAcmTrust(output.acm, context),
         };
     }
-    if (output.file !== undefined && output.file !== null) {
+    if (output.file != null) {
         return {
             file: deserializeAws_restJson1VirtualGatewayTlsValidationContextFileTrust(output.file, context),
         };
     }
-    if (output.sds !== undefined && output.sds !== null) {
+    if (output.sds != null) {
         return {
             sds: deserializeAws_restJson1VirtualGatewayTlsValidationContextSdsTrust(output.sds, context),
         };
@@ -12810,22 +12068,22 @@ const deserializeAws_restJson1VirtualGatewayTlsValidationContextTrust = (output,
     return { $unknown: Object.entries(output)[0] };
 };
 const deserializeAws_restJson1VirtualNodeConnectionPool = (output, context) => {
-    if (output.grpc !== undefined && output.grpc !== null) {
+    if (output.grpc != null) {
         return {
             grpc: deserializeAws_restJson1VirtualNodeGrpcConnectionPool(output.grpc, context),
         };
     }
-    if (output.http !== undefined && output.http !== null) {
+    if (output.http != null) {
         return {
             http: deserializeAws_restJson1VirtualNodeHttpConnectionPool(output.http, context),
         };
     }
-    if (output.http2 !== undefined && output.http2 !== null) {
+    if (output.http2 != null) {
         return {
             http2: deserializeAws_restJson1VirtualNodeHttp2ConnectionPool(output.http2, context),
         };
     }
-    if (output.tcp !== undefined && output.tcp !== null) {
+    if (output.tcp != null) {
         return {
             tcp: deserializeAws_restJson1VirtualNodeTcpConnectionPool(output.tcp, context),
         };
@@ -13002,12 +12260,12 @@ const deserializeAws_restJson1VirtualServiceList = (output, context) => {
     return retVal;
 };
 const deserializeAws_restJson1VirtualServiceProvider = (output, context) => {
-    if (output.virtualNode !== undefined && output.virtualNode !== null) {
+    if (output.virtualNode != null) {
         return {
             virtualNode: deserializeAws_restJson1VirtualNodeServiceProvider(output.virtualNode, context),
         };
     }
-    if (output.virtualRouter !== undefined && output.virtualRouter !== null) {
+    if (output.virtualRouter != null) {
         return {
             virtualRouter: deserializeAws_restJson1VirtualRouterServiceProvider(output.virtualRouter, context),
         };
@@ -13114,7 +12372,7 @@ const loadRestJsonErrorCode = (output, data) => {
 
 /***/ }),
 
-/***/ 9412:
+/***/ 7819:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -13122,10 +12380,10 @@ const loadRestJsonErrorCode = (output, data) => {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRuntimeConfig = void 0;
 const tslib_1 = __nccwpck_require__(1398);
-const package_json_1 = tslib_1.__importDefault(__nccwpck_require__(6001));
-const client_sts_1 = __nccwpck_require__(977);
+const package_json_1 = tslib_1.__importDefault(__nccwpck_require__(654));
+const client_sts_1 = __nccwpck_require__(6311);
 const config_resolver_1 = __nccwpck_require__(9256);
-const credential_provider_node_1 = __nccwpck_require__(2531);
+const credential_provider_node_1 = __nccwpck_require__(6418);
 const hash_node_1 = __nccwpck_require__(1330);
 const middleware_retry_1 = __nccwpck_require__(6472);
 const node_config_provider_1 = __nccwpck_require__(659);
@@ -13134,10 +12392,10 @@ const util_base64_node_1 = __nccwpck_require__(3994);
 const util_body_length_node_1 = __nccwpck_require__(2451);
 const util_user_agent_node_1 = __nccwpck_require__(9323);
 const util_utf8_node_1 = __nccwpck_require__(7193);
-const runtimeConfig_shared_1 = __nccwpck_require__(9384);
-const smithy_client_1 = __nccwpck_require__(6449);
-const util_defaults_mode_node_1 = __nccwpck_require__(9738);
-const smithy_client_2 = __nccwpck_require__(6449);
+const runtimeConfig_shared_1 = __nccwpck_require__(8294);
+const smithy_client_1 = __nccwpck_require__(1529);
+const util_defaults_mode_node_1 = __nccwpck_require__(1294);
+const smithy_client_2 = __nccwpck_require__(1529);
 const getRuntimeConfig = (config) => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
     (0, smithy_client_2.emitWarningIfUnsupportedVersion)(process.version);
@@ -13174,7 +12432,7 @@ exports.getRuntimeConfig = getRuntimeConfig;
 
 /***/ }),
 
-/***/ 9384:
+/***/ 8294:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -13182,7 +12440,7 @@ exports.getRuntimeConfig = getRuntimeConfig;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRuntimeConfig = void 0;
 const url_parser_1 = __nccwpck_require__(1864);
-const endpoints_1 = __nccwpck_require__(9968);
+const endpoints_1 = __nccwpck_require__(9655);
 const getRuntimeConfig = (config) => {
     var _a, _b, _c, _d, _e;
     return ({
@@ -13199,18 +12457,18 @@ exports.getRuntimeConfig = getRuntimeConfig;
 
 /***/ }),
 
-/***/ 1333:
+/***/ 4693:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SSO = void 0;
-const GetRoleCredentialsCommand_1 = __nccwpck_require__(6724);
-const ListAccountRolesCommand_1 = __nccwpck_require__(697);
-const ListAccountsCommand_1 = __nccwpck_require__(6183);
-const LogoutCommand_1 = __nccwpck_require__(7906);
-const SSOClient_1 = __nccwpck_require__(7528);
+const GetRoleCredentialsCommand_1 = __nccwpck_require__(9708);
+const ListAccountRolesCommand_1 = __nccwpck_require__(4069);
+const ListAccountsCommand_1 = __nccwpck_require__(9973);
+const LogoutCommand_1 = __nccwpck_require__(3618);
+const SSOClient_1 = __nccwpck_require__(437);
 class SSO extends SSOClient_1.SSOClient {
     getRoleCredentials(args, optionsOrCb, cb) {
         const command = new GetRoleCredentialsCommand_1.GetRoleCredentialsCommand(args);
@@ -13274,7 +12532,7 @@ exports.SSO = SSO;
 
 /***/ }),
 
-/***/ 7528:
+/***/ 437:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -13288,8 +12546,8 @@ const middleware_logger_1 = __nccwpck_require__(3272);
 const middleware_recursion_detection_1 = __nccwpck_require__(9585);
 const middleware_retry_1 = __nccwpck_require__(6472);
 const middleware_user_agent_1 = __nccwpck_require__(5508);
-const smithy_client_1 = __nccwpck_require__(6449);
-const runtimeConfig_1 = __nccwpck_require__(8611);
+const smithy_client_1 = __nccwpck_require__(1529);
+const runtimeConfig_1 = __nccwpck_require__(8587);
 class SSOClient extends smithy_client_1.Client {
     constructor(configuration) {
         const _config_0 = (0, runtimeConfig_1.getRuntimeConfig)(configuration);
@@ -13316,7 +12574,7 @@ exports.SSOClient = SSOClient;
 
 /***/ }),
 
-/***/ 6724:
+/***/ 9708:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -13324,9 +12582,9 @@ exports.SSOClient = SSOClient;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GetRoleCredentialsCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(1220);
-const Aws_restJson1_1 = __nccwpck_require__(9980);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(1764);
+const Aws_restJson1_1 = __nccwpck_require__(2785);
 class GetRoleCredentialsCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -13360,7 +12618,7 @@ exports.GetRoleCredentialsCommand = GetRoleCredentialsCommand;
 
 /***/ }),
 
-/***/ 697:
+/***/ 4069:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -13368,9 +12626,9 @@ exports.GetRoleCredentialsCommand = GetRoleCredentialsCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListAccountRolesCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(1220);
-const Aws_restJson1_1 = __nccwpck_require__(9980);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(1764);
+const Aws_restJson1_1 = __nccwpck_require__(2785);
 class ListAccountRolesCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -13404,7 +12662,7 @@ exports.ListAccountRolesCommand = ListAccountRolesCommand;
 
 /***/ }),
 
-/***/ 6183:
+/***/ 9973:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -13412,9 +12670,9 @@ exports.ListAccountRolesCommand = ListAccountRolesCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListAccountsCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(1220);
-const Aws_restJson1_1 = __nccwpck_require__(9980);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(1764);
+const Aws_restJson1_1 = __nccwpck_require__(2785);
 class ListAccountsCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -13448,7 +12706,7 @@ exports.ListAccountsCommand = ListAccountsCommand;
 
 /***/ }),
 
-/***/ 7906:
+/***/ 3618:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -13456,9 +12714,9 @@ exports.ListAccountsCommand = ListAccountsCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LogoutCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(1220);
-const Aws_restJson1_1 = __nccwpck_require__(9980);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(1764);
+const Aws_restJson1_1 = __nccwpck_require__(2785);
 class LogoutCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -13492,22 +12750,22 @@ exports.LogoutCommand = LogoutCommand;
 
 /***/ }),
 
-/***/ 7680:
+/***/ 6668:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(6724), exports);
-tslib_1.__exportStar(__nccwpck_require__(697), exports);
-tslib_1.__exportStar(__nccwpck_require__(6183), exports);
-tslib_1.__exportStar(__nccwpck_require__(7906), exports);
+tslib_1.__exportStar(__nccwpck_require__(9708), exports);
+tslib_1.__exportStar(__nccwpck_require__(4069), exports);
+tslib_1.__exportStar(__nccwpck_require__(9973), exports);
+tslib_1.__exportStar(__nccwpck_require__(3618), exports);
 
 
 /***/ }),
 
-/***/ 5007:
+/***/ 6675:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -13836,7 +13094,7 @@ exports.defaultRegionInfoProvider = defaultRegionInfoProvider;
 
 /***/ }),
 
-/***/ 416:
+/***/ 5080:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -13844,25 +13102,25 @@ exports.defaultRegionInfoProvider = defaultRegionInfoProvider;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SSOServiceException = void 0;
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(1333), exports);
-tslib_1.__exportStar(__nccwpck_require__(7528), exports);
-tslib_1.__exportStar(__nccwpck_require__(7680), exports);
-tslib_1.__exportStar(__nccwpck_require__(8296), exports);
-tslib_1.__exportStar(__nccwpck_require__(8626), exports);
-var SSOServiceException_1 = __nccwpck_require__(7102);
+tslib_1.__exportStar(__nccwpck_require__(4693), exports);
+tslib_1.__exportStar(__nccwpck_require__(437), exports);
+tslib_1.__exportStar(__nccwpck_require__(6668), exports);
+tslib_1.__exportStar(__nccwpck_require__(5631), exports);
+tslib_1.__exportStar(__nccwpck_require__(9685), exports);
+var SSOServiceException_1 = __nccwpck_require__(3363);
 Object.defineProperty(exports, "SSOServiceException", ({ enumerable: true, get: function () { return SSOServiceException_1.SSOServiceException; } }));
 
 
 /***/ }),
 
-/***/ 7102:
+/***/ 3363:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SSOServiceException = void 0;
-const smithy_client_1 = __nccwpck_require__(6449);
+const smithy_client_1 = __nccwpck_require__(1529);
 class SSOServiceException extends smithy_client_1.ServiceException {
     constructor(options) {
         super(options);
@@ -13874,27 +13132,27 @@ exports.SSOServiceException = SSOServiceException;
 
 /***/ }),
 
-/***/ 8296:
+/***/ 5631:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(1220), exports);
+tslib_1.__exportStar(__nccwpck_require__(1764), exports);
 
 
 /***/ }),
 
-/***/ 1220:
+/***/ 1764:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LogoutRequestFilterSensitiveLog = exports.ListAccountsResponseFilterSensitiveLog = exports.ListAccountsRequestFilterSensitiveLog = exports.ListAccountRolesResponseFilterSensitiveLog = exports.RoleInfoFilterSensitiveLog = exports.ListAccountRolesRequestFilterSensitiveLog = exports.GetRoleCredentialsResponseFilterSensitiveLog = exports.RoleCredentialsFilterSensitiveLog = exports.GetRoleCredentialsRequestFilterSensitiveLog = exports.AccountInfoFilterSensitiveLog = exports.UnauthorizedException = exports.TooManyRequestsException = exports.ResourceNotFoundException = exports.InvalidRequestException = void 0;
-const smithy_client_1 = __nccwpck_require__(6449);
-const SSOServiceException_1 = __nccwpck_require__(7102);
+const smithy_client_1 = __nccwpck_require__(1529);
+const SSOServiceException_1 = __nccwpck_require__(3363);
 class InvalidRequestException extends SSOServiceException_1.SSOServiceException {
     constructor(opts) {
         super({
@@ -13998,7 +13256,7 @@ exports.LogoutRequestFilterSensitiveLog = LogoutRequestFilterSensitiveLog;
 
 /***/ }),
 
-/***/ 2654:
+/***/ 6045:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -14008,16 +13266,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 3241:
+/***/ 9324:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.paginateListAccountRoles = void 0;
-const ListAccountRolesCommand_1 = __nccwpck_require__(697);
-const SSO_1 = __nccwpck_require__(1333);
-const SSOClient_1 = __nccwpck_require__(7528);
+const ListAccountRolesCommand_1 = __nccwpck_require__(4069);
+const SSO_1 = __nccwpck_require__(4693);
+const SSOClient_1 = __nccwpck_require__(437);
 const makePagedClientRequest = async (client, input, ...args) => {
     return await client.send(new ListAccountRolesCommand_1.ListAccountRolesCommand(input), ...args);
 };
@@ -14052,16 +13310,16 @@ exports.paginateListAccountRoles = paginateListAccountRoles;
 
 /***/ }),
 
-/***/ 1145:
+/***/ 3924:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.paginateListAccounts = void 0;
-const ListAccountsCommand_1 = __nccwpck_require__(6183);
-const SSO_1 = __nccwpck_require__(1333);
-const SSOClient_1 = __nccwpck_require__(7528);
+const ListAccountsCommand_1 = __nccwpck_require__(9973);
+const SSO_1 = __nccwpck_require__(4693);
+const SSOClient_1 = __nccwpck_require__(437);
 const makePagedClientRequest = async (client, input, ...args) => {
     return await client.send(new ListAccountsCommand_1.ListAccountsCommand(input), ...args);
 };
@@ -14096,21 +13354,21 @@ exports.paginateListAccounts = paginateListAccounts;
 
 /***/ }),
 
-/***/ 8626:
+/***/ 9685:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(2654), exports);
-tslib_1.__exportStar(__nccwpck_require__(3241), exports);
-tslib_1.__exportStar(__nccwpck_require__(1145), exports);
+tslib_1.__exportStar(__nccwpck_require__(6045), exports);
+tslib_1.__exportStar(__nccwpck_require__(9324), exports);
+tslib_1.__exportStar(__nccwpck_require__(3924), exports);
 
 
 /***/ }),
 
-/***/ 9980:
+/***/ 2785:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -14118,19 +13376,19 @@ tslib_1.__exportStar(__nccwpck_require__(1145), exports);
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deserializeAws_restJson1LogoutCommand = exports.deserializeAws_restJson1ListAccountsCommand = exports.deserializeAws_restJson1ListAccountRolesCommand = exports.deserializeAws_restJson1GetRoleCredentialsCommand = exports.serializeAws_restJson1LogoutCommand = exports.serializeAws_restJson1ListAccountsCommand = exports.serializeAws_restJson1ListAccountRolesCommand = exports.serializeAws_restJson1GetRoleCredentialsCommand = void 0;
 const protocol_http_1 = __nccwpck_require__(9992);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(1220);
-const SSOServiceException_1 = __nccwpck_require__(7102);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(1764);
+const SSOServiceException_1 = __nccwpck_require__(3363);
 const serializeAws_restJson1GetRoleCredentialsCommand = async (input, context) => {
     const { hostname, protocol = "https", port, path: basePath } = await context.endpoint();
-    const headers = {
-        ...(isSerializableHeaderValue(input.accessToken) && { "x-amz-sso_bearer_token": input.accessToken }),
-    };
+    const headers = map({}, isSerializableHeaderValue, {
+        "x-amz-sso_bearer_token": input.accessToken,
+    });
     const resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/federation/credentials";
-    const query = {
-        ...(input.roleName !== undefined && { role_name: input.roleName }),
-        ...(input.accountId !== undefined && { account_id: input.accountId }),
-    };
+    const query = map({
+        role_name: [, input.roleName],
+        account_id: [, input.accountId],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -14146,15 +13404,15 @@ const serializeAws_restJson1GetRoleCredentialsCommand = async (input, context) =
 exports.serializeAws_restJson1GetRoleCredentialsCommand = serializeAws_restJson1GetRoleCredentialsCommand;
 const serializeAws_restJson1ListAccountRolesCommand = async (input, context) => {
     const { hostname, protocol = "https", port, path: basePath } = await context.endpoint();
-    const headers = {
-        ...(isSerializableHeaderValue(input.accessToken) && { "x-amz-sso_bearer_token": input.accessToken }),
-    };
+    const headers = map({}, isSerializableHeaderValue, {
+        "x-amz-sso_bearer_token": input.accessToken,
+    });
     const resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/assignment/roles";
-    const query = {
-        ...(input.nextToken !== undefined && { next_token: input.nextToken }),
-        ...(input.maxResults !== undefined && { max_result: input.maxResults.toString() }),
-        ...(input.accountId !== undefined && { account_id: input.accountId }),
-    };
+    const query = map({
+        next_token: [, input.nextToken],
+        max_result: [() => input.maxResults !== void 0, () => input.maxResults.toString()],
+        account_id: [, input.accountId],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -14170,14 +13428,14 @@ const serializeAws_restJson1ListAccountRolesCommand = async (input, context) => 
 exports.serializeAws_restJson1ListAccountRolesCommand = serializeAws_restJson1ListAccountRolesCommand;
 const serializeAws_restJson1ListAccountsCommand = async (input, context) => {
     const { hostname, protocol = "https", port, path: basePath } = await context.endpoint();
-    const headers = {
-        ...(isSerializableHeaderValue(input.accessToken) && { "x-amz-sso_bearer_token": input.accessToken }),
-    };
+    const headers = map({}, isSerializableHeaderValue, {
+        "x-amz-sso_bearer_token": input.accessToken,
+    });
     const resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/assignment/accounts";
-    const query = {
-        ...(input.nextToken !== undefined && { next_token: input.nextToken }),
-        ...(input.maxResults !== undefined && { max_result: input.maxResults.toString() }),
-    };
+    const query = map({
+        next_token: [, input.nextToken],
+        max_result: [() => input.maxResults !== void 0, () => input.maxResults.toString()],
+    });
     let body;
     return new protocol_http_1.HttpRequest({
         protocol,
@@ -14193,9 +13451,9 @@ const serializeAws_restJson1ListAccountsCommand = async (input, context) => {
 exports.serializeAws_restJson1ListAccountsCommand = serializeAws_restJson1ListAccountsCommand;
 const serializeAws_restJson1LogoutCommand = async (input, context) => {
     const { hostname, protocol = "https", port, path: basePath } = await context.endpoint();
-    const headers = {
-        ...(isSerializableHeaderValue(input.accessToken) && { "x-amz-sso_bearer_token": input.accessToken }),
-    };
+    const headers = map({}, isSerializableHeaderValue, {
+        "x-amz-sso_bearer_token": input.accessToken,
+    });
     const resolvedPath = `${(basePath === null || basePath === void 0 ? void 0 : basePath.endsWith("/")) ? basePath.slice(0, -1) : basePath || ""}` + "/logout";
     let body;
     return new protocol_http_1.HttpRequest({
@@ -14213,15 +13471,14 @@ const deserializeAws_restJson1GetRoleCredentialsCommand = async (output, context
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1GetRoleCredentialsCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        roleCredentials: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.roleCredentials !== undefined && data.roleCredentials !== null) {
+    if (data.roleCredentials != null) {
         contents.roleCredentials = deserializeAws_restJson1RoleCredentials(data.roleCredentials, context);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1GetRoleCredentialsCommand = deserializeAws_restJson1GetRoleCredentialsCommand;
 const deserializeAws_restJson1GetRoleCredentialsCommandError = async (output, context) => {
@@ -14229,7 +13486,6 @@ const deserializeAws_restJson1GetRoleCredentialsCommandError = async (output, co
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "InvalidRequestException":
@@ -14246,33 +13502,29 @@ const deserializeAws_restJson1GetRoleCredentialsCommandError = async (output, co
             throw await deserializeAws_restJson1UnauthorizedExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new SSOServiceException_1.SSOServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: SSOServiceException_1.SSOServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1ListAccountRolesCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1ListAccountRolesCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        nextToken: undefined,
-        roleList: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.nextToken !== undefined && data.nextToken !== null) {
+    if (data.nextToken != null) {
         contents.nextToken = (0, smithy_client_1.expectString)(data.nextToken);
     }
-    if (data.roleList !== undefined && data.roleList !== null) {
+    if (data.roleList != null) {
         contents.roleList = deserializeAws_restJson1RoleListType(data.roleList, context);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1ListAccountRolesCommand = deserializeAws_restJson1ListAccountRolesCommand;
 const deserializeAws_restJson1ListAccountRolesCommandError = async (output, context) => {
@@ -14280,7 +13532,6 @@ const deserializeAws_restJson1ListAccountRolesCommandError = async (output, cont
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "InvalidRequestException":
@@ -14297,33 +13548,29 @@ const deserializeAws_restJson1ListAccountRolesCommandError = async (output, cont
             throw await deserializeAws_restJson1UnauthorizedExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new SSOServiceException_1.SSOServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: SSOServiceException_1.SSOServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1ListAccountsCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1ListAccountsCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-        accountList: undefined,
-        nextToken: undefined,
-    };
+    });
     const data = (0, smithy_client_1.expectNonNull)((0, smithy_client_1.expectObject)(await parseBody(output.body, context)), "body");
-    if (data.accountList !== undefined && data.accountList !== null) {
+    if (data.accountList != null) {
         contents.accountList = deserializeAws_restJson1AccountListType(data.accountList, context);
     }
-    if (data.nextToken !== undefined && data.nextToken !== null) {
+    if (data.nextToken != null) {
         contents.nextToken = (0, smithy_client_1.expectString)(data.nextToken);
     }
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1ListAccountsCommand = deserializeAws_restJson1ListAccountsCommand;
 const deserializeAws_restJson1ListAccountsCommandError = async (output, context) => {
@@ -14331,7 +13578,6 @@ const deserializeAws_restJson1ListAccountsCommandError = async (output, context)
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "InvalidRequestException":
@@ -14348,25 +13594,23 @@ const deserializeAws_restJson1ListAccountsCommandError = async (output, context)
             throw await deserializeAws_restJson1UnauthorizedExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new SSOServiceException_1.SSOServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: SSOServiceException_1.SSOServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
 const deserializeAws_restJson1LogoutCommand = async (output, context) => {
     if (output.statusCode !== 200 && output.statusCode >= 300) {
         return deserializeAws_restJson1LogoutCommandError(output, context);
     }
-    const contents = {
+    const contents = map({
         $metadata: deserializeMetadata(output),
-    };
+    });
     await collectBody(output.body, context);
-    return Promise.resolve(contents);
+    return contents;
 };
 exports.deserializeAws_restJson1LogoutCommand = deserializeAws_restJson1LogoutCommand;
 const deserializeAws_restJson1LogoutCommandError = async (output, context) => {
@@ -14374,7 +13618,6 @@ const deserializeAws_restJson1LogoutCommandError = async (output, context) => {
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadRestJsonErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "InvalidRequestException":
@@ -14388,20 +13631,19 @@ const deserializeAws_restJson1LogoutCommandError = async (output, context) => {
             throw await deserializeAws_restJson1UnauthorizedExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new SSOServiceException_1.SSOServiceException({
-                name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody,
+                exceptionCtor: SSOServiceException_1.SSOServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody);
     }
 };
+const map = smithy_client_1.map;
 const deserializeAws_restJson1InvalidRequestExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.InvalidRequestException({
@@ -14411,9 +13653,9 @@ const deserializeAws_restJson1InvalidRequestExceptionResponse = async (parsedOut
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1ResourceNotFoundExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.ResourceNotFoundException({
@@ -14423,9 +13665,9 @@ const deserializeAws_restJson1ResourceNotFoundExceptionResponse = async (parsedO
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1TooManyRequestsExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.TooManyRequestsException({
@@ -14435,9 +13677,9 @@ const deserializeAws_restJson1TooManyRequestsExceptionResponse = async (parsedOu
     return (0, smithy_client_1.decorateServiceException)(exception, parsedOutput.body);
 };
 const deserializeAws_restJson1UnauthorizedExceptionResponse = async (parsedOutput, context) => {
-    const contents = {};
+    const contents = map({});
     const data = parsedOutput.body;
-    if (data.message !== undefined && data.message !== null) {
+    if (data.message != null) {
         contents.message = (0, smithy_client_1.expectString)(data.message);
     }
     const exception = new models_0_1.UnauthorizedException({
@@ -14546,7 +13788,7 @@ const loadRestJsonErrorCode = (output, data) => {
 
 /***/ }),
 
-/***/ 8611:
+/***/ 8587:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -14554,7 +13796,7 @@ const loadRestJsonErrorCode = (output, data) => {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRuntimeConfig = void 0;
 const tslib_1 = __nccwpck_require__(1398);
-const package_json_1 = tslib_1.__importDefault(__nccwpck_require__(4216));
+const package_json_1 = tslib_1.__importDefault(__nccwpck_require__(8662));
 const config_resolver_1 = __nccwpck_require__(9256);
 const hash_node_1 = __nccwpck_require__(1330);
 const middleware_retry_1 = __nccwpck_require__(6472);
@@ -14564,10 +13806,10 @@ const util_base64_node_1 = __nccwpck_require__(3994);
 const util_body_length_node_1 = __nccwpck_require__(2451);
 const util_user_agent_node_1 = __nccwpck_require__(9323);
 const util_utf8_node_1 = __nccwpck_require__(7193);
-const runtimeConfig_shared_1 = __nccwpck_require__(6057);
-const smithy_client_1 = __nccwpck_require__(6449);
-const util_defaults_mode_node_1 = __nccwpck_require__(9738);
-const smithy_client_2 = __nccwpck_require__(6449);
+const runtimeConfig_shared_1 = __nccwpck_require__(1514);
+const smithy_client_1 = __nccwpck_require__(1529);
+const util_defaults_mode_node_1 = __nccwpck_require__(1294);
+const smithy_client_2 = __nccwpck_require__(1529);
 const getRuntimeConfig = (config) => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
     (0, smithy_client_2.emitWarningIfUnsupportedVersion)(process.version);
@@ -14603,7 +13845,7 @@ exports.getRuntimeConfig = getRuntimeConfig;
 
 /***/ }),
 
-/***/ 6057:
+/***/ 1514:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -14611,7 +13853,7 @@ exports.getRuntimeConfig = getRuntimeConfig;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRuntimeConfig = void 0;
 const url_parser_1 = __nccwpck_require__(1864);
-const endpoints_1 = __nccwpck_require__(5007);
+const endpoints_1 = __nccwpck_require__(6675);
 const getRuntimeConfig = (config) => {
     var _a, _b, _c, _d, _e;
     return ({
@@ -14628,22 +13870,22 @@ exports.getRuntimeConfig = getRuntimeConfig;
 
 /***/ }),
 
-/***/ 9122:
+/***/ 1700:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.STS = void 0;
-const AssumeRoleCommand_1 = __nccwpck_require__(7149);
-const AssumeRoleWithSAMLCommand_1 = __nccwpck_require__(8099);
-const AssumeRoleWithWebIdentityCommand_1 = __nccwpck_require__(9844);
-const DecodeAuthorizationMessageCommand_1 = __nccwpck_require__(7240);
-const GetAccessKeyInfoCommand_1 = __nccwpck_require__(4925);
-const GetCallerIdentityCommand_1 = __nccwpck_require__(3443);
-const GetFederationTokenCommand_1 = __nccwpck_require__(2173);
-const GetSessionTokenCommand_1 = __nccwpck_require__(7061);
-const STSClient_1 = __nccwpck_require__(7902);
+const AssumeRoleCommand_1 = __nccwpck_require__(9907);
+const AssumeRoleWithSAMLCommand_1 = __nccwpck_require__(4814);
+const AssumeRoleWithWebIdentityCommand_1 = __nccwpck_require__(8154);
+const DecodeAuthorizationMessageCommand_1 = __nccwpck_require__(9228);
+const GetAccessKeyInfoCommand_1 = __nccwpck_require__(9170);
+const GetCallerIdentityCommand_1 = __nccwpck_require__(3508);
+const GetFederationTokenCommand_1 = __nccwpck_require__(226);
+const GetSessionTokenCommand_1 = __nccwpck_require__(7172);
+const STSClient_1 = __nccwpck_require__(189);
 class STS extends STSClient_1.STSClient {
     assumeRole(args, optionsOrCb, cb) {
         const command = new AssumeRoleCommand_1.AssumeRoleCommand(args);
@@ -14763,7 +14005,7 @@ exports.STS = STS;
 
 /***/ }),
 
-/***/ 7902:
+/***/ 189:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -14778,8 +14020,8 @@ const middleware_recursion_detection_1 = __nccwpck_require__(9585);
 const middleware_retry_1 = __nccwpck_require__(6472);
 const middleware_sdk_sts_1 = __nccwpck_require__(5563);
 const middleware_user_agent_1 = __nccwpck_require__(5508);
-const smithy_client_1 = __nccwpck_require__(6449);
-const runtimeConfig_1 = __nccwpck_require__(3455);
+const smithy_client_1 = __nccwpck_require__(1529);
+const runtimeConfig_1 = __nccwpck_require__(1342);
 class STSClient extends smithy_client_1.Client {
     constructor(configuration) {
         const _config_0 = (0, runtimeConfig_1.getRuntimeConfig)(configuration);
@@ -14807,7 +14049,7 @@ exports.STSClient = STSClient;
 
 /***/ }),
 
-/***/ 7149:
+/***/ 9907:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -14816,9 +14058,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AssumeRoleCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
 const middleware_signing_1 = __nccwpck_require__(7146);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(6737);
-const Aws_query_1 = __nccwpck_require__(4265);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(6700);
+const Aws_query_1 = __nccwpck_require__(7889);
 class AssumeRoleCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -14853,7 +14095,7 @@ exports.AssumeRoleCommand = AssumeRoleCommand;
 
 /***/ }),
 
-/***/ 8099:
+/***/ 4814:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -14861,9 +14103,9 @@ exports.AssumeRoleCommand = AssumeRoleCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AssumeRoleWithSAMLCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(6737);
-const Aws_query_1 = __nccwpck_require__(4265);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(6700);
+const Aws_query_1 = __nccwpck_require__(7889);
 class AssumeRoleWithSAMLCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -14897,7 +14139,7 @@ exports.AssumeRoleWithSAMLCommand = AssumeRoleWithSAMLCommand;
 
 /***/ }),
 
-/***/ 9844:
+/***/ 8154:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -14905,9 +14147,9 @@ exports.AssumeRoleWithSAMLCommand = AssumeRoleWithSAMLCommand;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AssumeRoleWithWebIdentityCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(6737);
-const Aws_query_1 = __nccwpck_require__(4265);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(6700);
+const Aws_query_1 = __nccwpck_require__(7889);
 class AssumeRoleWithWebIdentityCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -14941,7 +14183,7 @@ exports.AssumeRoleWithWebIdentityCommand = AssumeRoleWithWebIdentityCommand;
 
 /***/ }),
 
-/***/ 7240:
+/***/ 9228:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -14950,9 +14192,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DecodeAuthorizationMessageCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
 const middleware_signing_1 = __nccwpck_require__(7146);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(6737);
-const Aws_query_1 = __nccwpck_require__(4265);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(6700);
+const Aws_query_1 = __nccwpck_require__(7889);
 class DecodeAuthorizationMessageCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -14987,7 +14229,7 @@ exports.DecodeAuthorizationMessageCommand = DecodeAuthorizationMessageCommand;
 
 /***/ }),
 
-/***/ 4925:
+/***/ 9170:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -14996,9 +14238,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GetAccessKeyInfoCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
 const middleware_signing_1 = __nccwpck_require__(7146);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(6737);
-const Aws_query_1 = __nccwpck_require__(4265);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(6700);
+const Aws_query_1 = __nccwpck_require__(7889);
 class GetAccessKeyInfoCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -15033,7 +14275,7 @@ exports.GetAccessKeyInfoCommand = GetAccessKeyInfoCommand;
 
 /***/ }),
 
-/***/ 3443:
+/***/ 3508:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -15042,9 +14284,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GetCallerIdentityCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
 const middleware_signing_1 = __nccwpck_require__(7146);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(6737);
-const Aws_query_1 = __nccwpck_require__(4265);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(6700);
+const Aws_query_1 = __nccwpck_require__(7889);
 class GetCallerIdentityCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -15079,7 +14321,7 @@ exports.GetCallerIdentityCommand = GetCallerIdentityCommand;
 
 /***/ }),
 
-/***/ 2173:
+/***/ 226:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -15088,9 +14330,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GetFederationTokenCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
 const middleware_signing_1 = __nccwpck_require__(7146);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(6737);
-const Aws_query_1 = __nccwpck_require__(4265);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(6700);
+const Aws_query_1 = __nccwpck_require__(7889);
 class GetFederationTokenCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -15125,7 +14367,7 @@ exports.GetFederationTokenCommand = GetFederationTokenCommand;
 
 /***/ }),
 
-/***/ 7061:
+/***/ 7172:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -15134,9 +14376,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GetSessionTokenCommand = void 0;
 const middleware_serde_1 = __nccwpck_require__(5665);
 const middleware_signing_1 = __nccwpck_require__(7146);
-const smithy_client_1 = __nccwpck_require__(6449);
-const models_0_1 = __nccwpck_require__(6737);
-const Aws_query_1 = __nccwpck_require__(4265);
+const smithy_client_1 = __nccwpck_require__(1529);
+const models_0_1 = __nccwpck_require__(6700);
+const Aws_query_1 = __nccwpck_require__(7889);
 class GetSessionTokenCommand extends smithy_client_1.Command {
     constructor(input) {
         super();
@@ -15171,34 +14413,34 @@ exports.GetSessionTokenCommand = GetSessionTokenCommand;
 
 /***/ }),
 
-/***/ 5817:
+/***/ 1906:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(7149), exports);
-tslib_1.__exportStar(__nccwpck_require__(8099), exports);
-tslib_1.__exportStar(__nccwpck_require__(9844), exports);
-tslib_1.__exportStar(__nccwpck_require__(7240), exports);
-tslib_1.__exportStar(__nccwpck_require__(4925), exports);
-tslib_1.__exportStar(__nccwpck_require__(3443), exports);
-tslib_1.__exportStar(__nccwpck_require__(2173), exports);
-tslib_1.__exportStar(__nccwpck_require__(7061), exports);
+tslib_1.__exportStar(__nccwpck_require__(9907), exports);
+tslib_1.__exportStar(__nccwpck_require__(4814), exports);
+tslib_1.__exportStar(__nccwpck_require__(8154), exports);
+tslib_1.__exportStar(__nccwpck_require__(9228), exports);
+tslib_1.__exportStar(__nccwpck_require__(9170), exports);
+tslib_1.__exportStar(__nccwpck_require__(3508), exports);
+tslib_1.__exportStar(__nccwpck_require__(226), exports);
+tslib_1.__exportStar(__nccwpck_require__(7172), exports);
 
 
 /***/ }),
 
-/***/ 9542:
+/***/ 9125:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.decorateDefaultCredentialProvider = exports.getDefaultRoleAssumerWithWebIdentity = exports.getDefaultRoleAssumer = void 0;
-const defaultStsRoleAssumers_1 = __nccwpck_require__(9296);
-const STSClient_1 = __nccwpck_require__(7902);
+const defaultStsRoleAssumers_1 = __nccwpck_require__(4881);
+const STSClient_1 = __nccwpck_require__(189);
 const getDefaultRoleAssumer = (stsOptions = {}) => (0, defaultStsRoleAssumers_1.getDefaultRoleAssumer)(stsOptions, STSClient_1.STSClient);
 exports.getDefaultRoleAssumer = getDefaultRoleAssumer;
 const getDefaultRoleAssumerWithWebIdentity = (stsOptions = {}) => (0, defaultStsRoleAssumers_1.getDefaultRoleAssumerWithWebIdentity)(stsOptions, STSClient_1.STSClient);
@@ -15213,15 +14455,15 @@ exports.decorateDefaultCredentialProvider = decorateDefaultCredentialProvider;
 
 /***/ }),
 
-/***/ 9296:
+/***/ 4881:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.decorateDefaultCredentialProvider = exports.getDefaultRoleAssumerWithWebIdentity = exports.getDefaultRoleAssumer = void 0;
-const AssumeRoleCommand_1 = __nccwpck_require__(7149);
-const AssumeRoleWithWebIdentityCommand_1 = __nccwpck_require__(9844);
+const AssumeRoleCommand_1 = __nccwpck_require__(9907);
+const AssumeRoleWithWebIdentityCommand_1 = __nccwpck_require__(8154);
 const ASSUME_ROLE_DEFAULT_REGION = "us-east-1";
 const decorateDefaultRegion = (region) => {
     if (typeof region !== "function") {
@@ -15297,7 +14539,7 @@ exports.decorateDefaultCredentialProvider = decorateDefaultCredentialProvider;
 
 /***/ }),
 
-/***/ 7437:
+/***/ 7466:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -15499,7 +14741,7 @@ exports.defaultRegionInfoProvider = defaultRegionInfoProvider;
 
 /***/ }),
 
-/***/ 977:
+/***/ 6311:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -15507,25 +14749,25 @@ exports.defaultRegionInfoProvider = defaultRegionInfoProvider;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.STSServiceException = void 0;
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(9122), exports);
-tslib_1.__exportStar(__nccwpck_require__(7902), exports);
-tslib_1.__exportStar(__nccwpck_require__(5817), exports);
-tslib_1.__exportStar(__nccwpck_require__(9542), exports);
-tslib_1.__exportStar(__nccwpck_require__(9302), exports);
-var STSServiceException_1 = __nccwpck_require__(1025);
+tslib_1.__exportStar(__nccwpck_require__(1700), exports);
+tslib_1.__exportStar(__nccwpck_require__(189), exports);
+tslib_1.__exportStar(__nccwpck_require__(1906), exports);
+tslib_1.__exportStar(__nccwpck_require__(9125), exports);
+tslib_1.__exportStar(__nccwpck_require__(7183), exports);
+var STSServiceException_1 = __nccwpck_require__(6589);
 Object.defineProperty(exports, "STSServiceException", ({ enumerable: true, get: function () { return STSServiceException_1.STSServiceException; } }));
 
 
 /***/ }),
 
-/***/ 1025:
+/***/ 6589:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.STSServiceException = void 0;
-const smithy_client_1 = __nccwpck_require__(6449);
+const smithy_client_1 = __nccwpck_require__(1529);
 class STSServiceException extends smithy_client_1.ServiceException {
     constructor(options) {
         super(options);
@@ -15537,26 +14779,26 @@ exports.STSServiceException = STSServiceException;
 
 /***/ }),
 
-/***/ 9302:
+/***/ 7183:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(6737), exports);
+tslib_1.__exportStar(__nccwpck_require__(6700), exports);
 
 
 /***/ }),
 
-/***/ 6737:
+/***/ 6700:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GetSessionTokenResponseFilterSensitiveLog = exports.GetSessionTokenRequestFilterSensitiveLog = exports.GetFederationTokenResponseFilterSensitiveLog = exports.FederatedUserFilterSensitiveLog = exports.GetFederationTokenRequestFilterSensitiveLog = exports.GetCallerIdentityResponseFilterSensitiveLog = exports.GetCallerIdentityRequestFilterSensitiveLog = exports.GetAccessKeyInfoResponseFilterSensitiveLog = exports.GetAccessKeyInfoRequestFilterSensitiveLog = exports.DecodeAuthorizationMessageResponseFilterSensitiveLog = exports.DecodeAuthorizationMessageRequestFilterSensitiveLog = exports.AssumeRoleWithWebIdentityResponseFilterSensitiveLog = exports.AssumeRoleWithWebIdentityRequestFilterSensitiveLog = exports.AssumeRoleWithSAMLResponseFilterSensitiveLog = exports.AssumeRoleWithSAMLRequestFilterSensitiveLog = exports.AssumeRoleResponseFilterSensitiveLog = exports.CredentialsFilterSensitiveLog = exports.AssumeRoleRequestFilterSensitiveLog = exports.TagFilterSensitiveLog = exports.PolicyDescriptorTypeFilterSensitiveLog = exports.AssumedRoleUserFilterSensitiveLog = exports.InvalidAuthorizationMessageException = exports.IDPCommunicationErrorException = exports.InvalidIdentityTokenException = exports.IDPRejectedClaimException = exports.RegionDisabledException = exports.PackedPolicyTooLargeException = exports.MalformedPolicyDocumentException = exports.ExpiredTokenException = void 0;
-const STSServiceException_1 = __nccwpck_require__(1025);
+const STSServiceException_1 = __nccwpck_require__(6589);
 class ExpiredTokenException extends STSServiceException_1.STSServiceException {
     constructor(opts) {
         super({
@@ -15749,7 +14991,7 @@ exports.GetSessionTokenResponseFilterSensitiveLog = GetSessionTokenResponseFilte
 
 /***/ }),
 
-/***/ 4265:
+/***/ 7889:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -15757,11 +14999,11 @@ exports.GetSessionTokenResponseFilterSensitiveLog = GetSessionTokenResponseFilte
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deserializeAws_queryGetSessionTokenCommand = exports.deserializeAws_queryGetFederationTokenCommand = exports.deserializeAws_queryGetCallerIdentityCommand = exports.deserializeAws_queryGetAccessKeyInfoCommand = exports.deserializeAws_queryDecodeAuthorizationMessageCommand = exports.deserializeAws_queryAssumeRoleWithWebIdentityCommand = exports.deserializeAws_queryAssumeRoleWithSAMLCommand = exports.deserializeAws_queryAssumeRoleCommand = exports.serializeAws_queryGetSessionTokenCommand = exports.serializeAws_queryGetFederationTokenCommand = exports.serializeAws_queryGetCallerIdentityCommand = exports.serializeAws_queryGetAccessKeyInfoCommand = exports.serializeAws_queryDecodeAuthorizationMessageCommand = exports.serializeAws_queryAssumeRoleWithWebIdentityCommand = exports.serializeAws_queryAssumeRoleWithSAMLCommand = exports.serializeAws_queryAssumeRoleCommand = void 0;
 const protocol_http_1 = __nccwpck_require__(9992);
-const smithy_client_1 = __nccwpck_require__(6449);
+const smithy_client_1 = __nccwpck_require__(1529);
 const entities_1 = __nccwpck_require__(191);
 const fast_xml_parser_1 = __nccwpck_require__(1241);
-const models_0_1 = __nccwpck_require__(6737);
-const STSServiceException_1 = __nccwpck_require__(1025);
+const models_0_1 = __nccwpck_require__(6700);
+const STSServiceException_1 = __nccwpck_require__(6589);
 const serializeAws_queryAssumeRoleCommand = async (input, context) => {
     const headers = {
         "content-type": "application/x-www-form-urlencoded",
@@ -15885,7 +15127,6 @@ const deserializeAws_queryAssumeRoleCommandError = async (output, context) => {
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadQueryErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "ExpiredTokenException":
@@ -15902,14 +15143,12 @@ const deserializeAws_queryAssumeRoleCommandError = async (output, context) => {
             throw await deserializeAws_queryRegionDisabledExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new STSServiceException_1.STSServiceException({
-                name: parsedBody.Error.code || parsedBody.Error.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody: parsedBody.Error,
+                exceptionCtor: STSServiceException_1.STSServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody.Error);
     }
 };
 const deserializeAws_queryAssumeRoleWithSAMLCommand = async (output, context) => {
@@ -15931,7 +15170,6 @@ const deserializeAws_queryAssumeRoleWithSAMLCommandError = async (output, contex
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadQueryErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "ExpiredTokenException":
@@ -15954,14 +15192,12 @@ const deserializeAws_queryAssumeRoleWithSAMLCommandError = async (output, contex
             throw await deserializeAws_queryRegionDisabledExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new STSServiceException_1.STSServiceException({
-                name: parsedBody.Error.code || parsedBody.Error.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody: parsedBody.Error,
+                exceptionCtor: STSServiceException_1.STSServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody.Error);
     }
 };
 const deserializeAws_queryAssumeRoleWithWebIdentityCommand = async (output, context) => {
@@ -15983,7 +15219,6 @@ const deserializeAws_queryAssumeRoleWithWebIdentityCommandError = async (output,
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadQueryErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "ExpiredTokenException":
@@ -16009,14 +15244,12 @@ const deserializeAws_queryAssumeRoleWithWebIdentityCommandError = async (output,
             throw await deserializeAws_queryRegionDisabledExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new STSServiceException_1.STSServiceException({
-                name: parsedBody.Error.code || parsedBody.Error.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody: parsedBody.Error,
+                exceptionCtor: STSServiceException_1.STSServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody.Error);
     }
 };
 const deserializeAws_queryDecodeAuthorizationMessageCommand = async (output, context) => {
@@ -16038,7 +15271,6 @@ const deserializeAws_queryDecodeAuthorizationMessageCommandError = async (output
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadQueryErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "InvalidAuthorizationMessageException":
@@ -16046,14 +15278,12 @@ const deserializeAws_queryDecodeAuthorizationMessageCommandError = async (output
             throw await deserializeAws_queryInvalidAuthorizationMessageExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new STSServiceException_1.STSServiceException({
-                name: parsedBody.Error.code || parsedBody.Error.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody: parsedBody.Error,
+                exceptionCtor: STSServiceException_1.STSServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody.Error);
     }
 };
 const deserializeAws_queryGetAccessKeyInfoCommand = async (output, context) => {
@@ -16075,20 +15305,14 @@ const deserializeAws_queryGetAccessKeyInfoCommandError = async (output, context)
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadQueryErrorCode(output, parsedOutput.body);
-    switch (errorCode) {
-        default:
-            const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new STSServiceException_1.STSServiceException({
-                name: parsedBody.Error.code || parsedBody.Error.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
-            });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody.Error);
-    }
+    const parsedBody = parsedOutput.body;
+    (0, smithy_client_1.throwDefaultError)({
+        output,
+        parsedBody: parsedBody.Error,
+        exceptionCtor: STSServiceException_1.STSServiceException,
+        errorCode,
+    });
 };
 const deserializeAws_queryGetCallerIdentityCommand = async (output, context) => {
     if (output.statusCode >= 300) {
@@ -16109,20 +15333,14 @@ const deserializeAws_queryGetCallerIdentityCommandError = async (output, context
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadQueryErrorCode(output, parsedOutput.body);
-    switch (errorCode) {
-        default:
-            const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new STSServiceException_1.STSServiceException({
-                name: parsedBody.Error.code || parsedBody.Error.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
-            });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody.Error);
-    }
+    const parsedBody = parsedOutput.body;
+    (0, smithy_client_1.throwDefaultError)({
+        output,
+        parsedBody: parsedBody.Error,
+        exceptionCtor: STSServiceException_1.STSServiceException,
+        errorCode,
+    });
 };
 const deserializeAws_queryGetFederationTokenCommand = async (output, context) => {
     if (output.statusCode >= 300) {
@@ -16143,7 +15361,6 @@ const deserializeAws_queryGetFederationTokenCommandError = async (output, contex
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadQueryErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "MalformedPolicyDocumentException":
@@ -16157,14 +15374,12 @@ const deserializeAws_queryGetFederationTokenCommandError = async (output, contex
             throw await deserializeAws_queryRegionDisabledExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new STSServiceException_1.STSServiceException({
-                name: parsedBody.Error.code || parsedBody.Error.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody: parsedBody.Error,
+                exceptionCtor: STSServiceException_1.STSServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody.Error);
     }
 };
 const deserializeAws_queryGetSessionTokenCommand = async (output, context) => {
@@ -16186,7 +15401,6 @@ const deserializeAws_queryGetSessionTokenCommandError = async (output, context) 
         ...output,
         body: await parseBody(output.body, context),
     };
-    let response;
     const errorCode = loadQueryErrorCode(output, parsedOutput.body);
     switch (errorCode) {
         case "RegionDisabledException":
@@ -16194,14 +15408,12 @@ const deserializeAws_queryGetSessionTokenCommandError = async (output, context) 
             throw await deserializeAws_queryRegionDisabledExceptionResponse(parsedOutput, context);
         default:
             const parsedBody = parsedOutput.body;
-            const $metadata = deserializeMetadata(output);
-            const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
-            response = new STSServiceException_1.STSServiceException({
-                name: parsedBody.Error.code || parsedBody.Error.Code || errorCode || statusCode || "UnknowError",
-                $fault: "client",
-                $metadata,
+            (0, smithy_client_1.throwDefaultError)({
+                output,
+                parsedBody: parsedBody.Error,
+                exceptionCtor: STSServiceException_1.STSServiceException,
+                errorCode,
             });
-            throw (0, smithy_client_1.decorateServiceException)(response, parsedBody.Error);
     }
 };
 const deserializeAws_queryExpiredTokenExceptionResponse = async (parsedOutput, context) => {
@@ -16278,118 +15490,118 @@ const deserializeAws_queryRegionDisabledExceptionResponse = async (parsedOutput,
 };
 const serializeAws_queryAssumeRoleRequest = (input, context) => {
     const entries = {};
-    if (input.RoleArn !== undefined && input.RoleArn !== null) {
+    if (input.RoleArn != null) {
         entries["RoleArn"] = input.RoleArn;
     }
-    if (input.RoleSessionName !== undefined && input.RoleSessionName !== null) {
+    if (input.RoleSessionName != null) {
         entries["RoleSessionName"] = input.RoleSessionName;
     }
-    if (input.PolicyArns !== undefined && input.PolicyArns !== null) {
+    if (input.PolicyArns != null) {
         const memberEntries = serializeAws_querypolicyDescriptorListType(input.PolicyArns, context);
         Object.entries(memberEntries).forEach(([key, value]) => {
             const loc = `PolicyArns.${key}`;
             entries[loc] = value;
         });
     }
-    if (input.Policy !== undefined && input.Policy !== null) {
+    if (input.Policy != null) {
         entries["Policy"] = input.Policy;
     }
-    if (input.DurationSeconds !== undefined && input.DurationSeconds !== null) {
+    if (input.DurationSeconds != null) {
         entries["DurationSeconds"] = input.DurationSeconds;
     }
-    if (input.Tags !== undefined && input.Tags !== null) {
+    if (input.Tags != null) {
         const memberEntries = serializeAws_querytagListType(input.Tags, context);
         Object.entries(memberEntries).forEach(([key, value]) => {
             const loc = `Tags.${key}`;
             entries[loc] = value;
         });
     }
-    if (input.TransitiveTagKeys !== undefined && input.TransitiveTagKeys !== null) {
+    if (input.TransitiveTagKeys != null) {
         const memberEntries = serializeAws_querytagKeyListType(input.TransitiveTagKeys, context);
         Object.entries(memberEntries).forEach(([key, value]) => {
             const loc = `TransitiveTagKeys.${key}`;
             entries[loc] = value;
         });
     }
-    if (input.ExternalId !== undefined && input.ExternalId !== null) {
+    if (input.ExternalId != null) {
         entries["ExternalId"] = input.ExternalId;
     }
-    if (input.SerialNumber !== undefined && input.SerialNumber !== null) {
+    if (input.SerialNumber != null) {
         entries["SerialNumber"] = input.SerialNumber;
     }
-    if (input.TokenCode !== undefined && input.TokenCode !== null) {
+    if (input.TokenCode != null) {
         entries["TokenCode"] = input.TokenCode;
     }
-    if (input.SourceIdentity !== undefined && input.SourceIdentity !== null) {
+    if (input.SourceIdentity != null) {
         entries["SourceIdentity"] = input.SourceIdentity;
     }
     return entries;
 };
 const serializeAws_queryAssumeRoleWithSAMLRequest = (input, context) => {
     const entries = {};
-    if (input.RoleArn !== undefined && input.RoleArn !== null) {
+    if (input.RoleArn != null) {
         entries["RoleArn"] = input.RoleArn;
     }
-    if (input.PrincipalArn !== undefined && input.PrincipalArn !== null) {
+    if (input.PrincipalArn != null) {
         entries["PrincipalArn"] = input.PrincipalArn;
     }
-    if (input.SAMLAssertion !== undefined && input.SAMLAssertion !== null) {
+    if (input.SAMLAssertion != null) {
         entries["SAMLAssertion"] = input.SAMLAssertion;
     }
-    if (input.PolicyArns !== undefined && input.PolicyArns !== null) {
+    if (input.PolicyArns != null) {
         const memberEntries = serializeAws_querypolicyDescriptorListType(input.PolicyArns, context);
         Object.entries(memberEntries).forEach(([key, value]) => {
             const loc = `PolicyArns.${key}`;
             entries[loc] = value;
         });
     }
-    if (input.Policy !== undefined && input.Policy !== null) {
+    if (input.Policy != null) {
         entries["Policy"] = input.Policy;
     }
-    if (input.DurationSeconds !== undefined && input.DurationSeconds !== null) {
+    if (input.DurationSeconds != null) {
         entries["DurationSeconds"] = input.DurationSeconds;
     }
     return entries;
 };
 const serializeAws_queryAssumeRoleWithWebIdentityRequest = (input, context) => {
     const entries = {};
-    if (input.RoleArn !== undefined && input.RoleArn !== null) {
+    if (input.RoleArn != null) {
         entries["RoleArn"] = input.RoleArn;
     }
-    if (input.RoleSessionName !== undefined && input.RoleSessionName !== null) {
+    if (input.RoleSessionName != null) {
         entries["RoleSessionName"] = input.RoleSessionName;
     }
-    if (input.WebIdentityToken !== undefined && input.WebIdentityToken !== null) {
+    if (input.WebIdentityToken != null) {
         entries["WebIdentityToken"] = input.WebIdentityToken;
     }
-    if (input.ProviderId !== undefined && input.ProviderId !== null) {
+    if (input.ProviderId != null) {
         entries["ProviderId"] = input.ProviderId;
     }
-    if (input.PolicyArns !== undefined && input.PolicyArns !== null) {
+    if (input.PolicyArns != null) {
         const memberEntries = serializeAws_querypolicyDescriptorListType(input.PolicyArns, context);
         Object.entries(memberEntries).forEach(([key, value]) => {
             const loc = `PolicyArns.${key}`;
             entries[loc] = value;
         });
     }
-    if (input.Policy !== undefined && input.Policy !== null) {
+    if (input.Policy != null) {
         entries["Policy"] = input.Policy;
     }
-    if (input.DurationSeconds !== undefined && input.DurationSeconds !== null) {
+    if (input.DurationSeconds != null) {
         entries["DurationSeconds"] = input.DurationSeconds;
     }
     return entries;
 };
 const serializeAws_queryDecodeAuthorizationMessageRequest = (input, context) => {
     const entries = {};
-    if (input.EncodedMessage !== undefined && input.EncodedMessage !== null) {
+    if (input.EncodedMessage != null) {
         entries["EncodedMessage"] = input.EncodedMessage;
     }
     return entries;
 };
 const serializeAws_queryGetAccessKeyInfoRequest = (input, context) => {
     const entries = {};
-    if (input.AccessKeyId !== undefined && input.AccessKeyId !== null) {
+    if (input.AccessKeyId != null) {
         entries["AccessKeyId"] = input.AccessKeyId;
     }
     return entries;
@@ -16400,23 +15612,23 @@ const serializeAws_queryGetCallerIdentityRequest = (input, context) => {
 };
 const serializeAws_queryGetFederationTokenRequest = (input, context) => {
     const entries = {};
-    if (input.Name !== undefined && input.Name !== null) {
+    if (input.Name != null) {
         entries["Name"] = input.Name;
     }
-    if (input.Policy !== undefined && input.Policy !== null) {
+    if (input.Policy != null) {
         entries["Policy"] = input.Policy;
     }
-    if (input.PolicyArns !== undefined && input.PolicyArns !== null) {
+    if (input.PolicyArns != null) {
         const memberEntries = serializeAws_querypolicyDescriptorListType(input.PolicyArns, context);
         Object.entries(memberEntries).forEach(([key, value]) => {
             const loc = `PolicyArns.${key}`;
             entries[loc] = value;
         });
     }
-    if (input.DurationSeconds !== undefined && input.DurationSeconds !== null) {
+    if (input.DurationSeconds != null) {
         entries["DurationSeconds"] = input.DurationSeconds;
     }
-    if (input.Tags !== undefined && input.Tags !== null) {
+    if (input.Tags != null) {
         const memberEntries = serializeAws_querytagListType(input.Tags, context);
         Object.entries(memberEntries).forEach(([key, value]) => {
             const loc = `Tags.${key}`;
@@ -16427,13 +15639,13 @@ const serializeAws_queryGetFederationTokenRequest = (input, context) => {
 };
 const serializeAws_queryGetSessionTokenRequest = (input, context) => {
     const entries = {};
-    if (input.DurationSeconds !== undefined && input.DurationSeconds !== null) {
+    if (input.DurationSeconds != null) {
         entries["DurationSeconds"] = input.DurationSeconds;
     }
-    if (input.SerialNumber !== undefined && input.SerialNumber !== null) {
+    if (input.SerialNumber != null) {
         entries["SerialNumber"] = input.SerialNumber;
     }
-    if (input.TokenCode !== undefined && input.TokenCode !== null) {
+    if (input.TokenCode != null) {
         entries["TokenCode"] = input.TokenCode;
     }
     return entries;
@@ -16455,17 +15667,17 @@ const serializeAws_querypolicyDescriptorListType = (input, context) => {
 };
 const serializeAws_queryPolicyDescriptorType = (input, context) => {
     const entries = {};
-    if (input.arn !== undefined && input.arn !== null) {
+    if (input.arn != null) {
         entries["arn"] = input.arn;
     }
     return entries;
 };
 const serializeAws_queryTag = (input, context) => {
     const entries = {};
-    if (input.Key !== undefined && input.Key !== null) {
+    if (input.Key != null) {
         entries["Key"] = input.Key;
     }
-    if (input.Value !== undefined && input.Value !== null) {
+    if (input.Value != null) {
         entries["Value"] = input.Value;
     }
     return entries;
@@ -16841,7 +16053,7 @@ const loadQueryErrorCode = (output, data) => {
 
 /***/ }),
 
-/***/ 3455:
+/***/ 1342:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -16849,10 +16061,10 @@ const loadQueryErrorCode = (output, data) => {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRuntimeConfig = void 0;
 const tslib_1 = __nccwpck_require__(1398);
-const package_json_1 = tslib_1.__importDefault(__nccwpck_require__(5655));
-const defaultStsRoleAssumers_1 = __nccwpck_require__(9296);
+const package_json_1 = tslib_1.__importDefault(__nccwpck_require__(5401));
+const defaultStsRoleAssumers_1 = __nccwpck_require__(4881);
 const config_resolver_1 = __nccwpck_require__(9256);
-const credential_provider_node_1 = __nccwpck_require__(2531);
+const credential_provider_node_1 = __nccwpck_require__(6418);
 const hash_node_1 = __nccwpck_require__(1330);
 const middleware_retry_1 = __nccwpck_require__(6472);
 const node_config_provider_1 = __nccwpck_require__(659);
@@ -16861,10 +16073,10 @@ const util_base64_node_1 = __nccwpck_require__(3994);
 const util_body_length_node_1 = __nccwpck_require__(2451);
 const util_user_agent_node_1 = __nccwpck_require__(9323);
 const util_utf8_node_1 = __nccwpck_require__(7193);
-const runtimeConfig_shared_1 = __nccwpck_require__(1438);
-const smithy_client_1 = __nccwpck_require__(6449);
-const util_defaults_mode_node_1 = __nccwpck_require__(9738);
-const smithy_client_2 = __nccwpck_require__(6449);
+const runtimeConfig_shared_1 = __nccwpck_require__(5990);
+const smithy_client_1 = __nccwpck_require__(1529);
+const util_defaults_mode_node_1 = __nccwpck_require__(1294);
+const smithy_client_2 = __nccwpck_require__(1529);
 const getRuntimeConfig = (config) => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
     (0, smithy_client_2.emitWarningIfUnsupportedVersion)(process.version);
@@ -16901,7 +16113,7 @@ exports.getRuntimeConfig = getRuntimeConfig;
 
 /***/ }),
 
-/***/ 1438:
+/***/ 5990:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -16909,7 +16121,7 @@ exports.getRuntimeConfig = getRuntimeConfig;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRuntimeConfig = void 0;
 const url_parser_1 = __nccwpck_require__(1864);
-const endpoints_1 = __nccwpck_require__(7437);
+const endpoints_1 = __nccwpck_require__(7466);
 const getRuntimeConfig = (config) => {
     var _a, _b, _c, _d, _e;
     return ({
@@ -17855,7 +17067,7 @@ exports.staticStabilityProvider = staticStabilityProvider;
 
 /***/ }),
 
-/***/ 9280:
+/***/ 1405:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -17863,7 +17075,7 @@ exports.staticStabilityProvider = staticStabilityProvider;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.fromIni = void 0;
 const shared_ini_file_loader_1 = __nccwpck_require__(6361);
-const resolveProfileData_1 = __nccwpck_require__(4046);
+const resolveProfileData_1 = __nccwpck_require__(2946);
 const fromIni = (init = {}) => async () => {
     const profiles = await (0, shared_ini_file_loader_1.parseKnownFiles)(init);
     return (0, resolveProfileData_1.resolveProfileData)((0, shared_ini_file_loader_1.getProfileName)(init), profiles, init);
@@ -17873,19 +17085,19 @@ exports.fromIni = fromIni;
 
 /***/ }),
 
-/***/ 3982:
+/***/ 7740:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(9280), exports);
+tslib_1.__exportStar(__nccwpck_require__(1405), exports);
 
 
 /***/ }),
 
-/***/ 2048:
+/***/ 2149:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -17894,8 +17106,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resolveAssumeRoleCredentials = exports.isAssumeRoleProfile = void 0;
 const property_provider_1 = __nccwpck_require__(2669);
 const shared_ini_file_loader_1 = __nccwpck_require__(6361);
-const resolveCredentialSource_1 = __nccwpck_require__(6148);
-const resolveProfileData_1 = __nccwpck_require__(4046);
+const resolveCredentialSource_1 = __nccwpck_require__(916);
+const resolveProfileData_1 = __nccwpck_require__(2946);
 const isAssumeRoleProfile = (arg) => Boolean(arg) &&
     typeof arg === "object" &&
     typeof arg.role_arn === "string" &&
@@ -17944,7 +17156,7 @@ exports.resolveAssumeRoleCredentials = resolveAssumeRoleCredentials;
 
 /***/ }),
 
-/***/ 6148:
+/***/ 916:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -17973,7 +17185,7 @@ exports.resolveCredentialSource = resolveCredentialSource;
 
 /***/ }),
 
-/***/ 4046:
+/***/ 2946:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -17981,10 +17193,10 @@ exports.resolveCredentialSource = resolveCredentialSource;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resolveProfileData = void 0;
 const property_provider_1 = __nccwpck_require__(2669);
-const resolveAssumeRoleCredentials_1 = __nccwpck_require__(2048);
-const resolveSsoCredentials_1 = __nccwpck_require__(973);
-const resolveStaticCredentials_1 = __nccwpck_require__(1193);
-const resolveWebIdentityCredentials_1 = __nccwpck_require__(711);
+const resolveAssumeRoleCredentials_1 = __nccwpck_require__(2149);
+const resolveSsoCredentials_1 = __nccwpck_require__(3268);
+const resolveStaticCredentials_1 = __nccwpck_require__(776);
+const resolveWebIdentityCredentials_1 = __nccwpck_require__(4024);
 const resolveProfileData = async (profileName, profiles, options, visitedProfiles = {}) => {
     const data = profiles[profileName];
     if (Object.keys(visitedProfiles).length > 0 && (0, resolveStaticCredentials_1.isStaticCredsProfile)(data)) {
@@ -18009,15 +17221,15 @@ exports.resolveProfileData = resolveProfileData;
 
 /***/ }),
 
-/***/ 973:
+/***/ 3268:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resolveSsoCredentials = exports.isSsoProfile = void 0;
-const credential_provider_sso_1 = __nccwpck_require__(9520);
-var credential_provider_sso_2 = __nccwpck_require__(9520);
+const credential_provider_sso_1 = __nccwpck_require__(2905);
+var credential_provider_sso_2 = __nccwpck_require__(2905);
 Object.defineProperty(exports, "isSsoProfile", ({ enumerable: true, get: function () { return credential_provider_sso_2.isSsoProfile; } }));
 const resolveSsoCredentials = (data) => {
     const { sso_start_url, sso_account_id, sso_region, sso_role_name } = (0, credential_provider_sso_1.validateSsoProfile)(data);
@@ -18033,7 +17245,7 @@ exports.resolveSsoCredentials = resolveSsoCredentials;
 
 /***/ }),
 
-/***/ 1193:
+/***/ 776:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -18056,7 +17268,7 @@ exports.resolveStaticCredentials = resolveStaticCredentials;
 
 /***/ }),
 
-/***/ 711:
+/***/ 4024:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -18081,7 +17293,7 @@ exports.resolveWebIdentityCredentials = resolveWebIdentityCredentials;
 
 /***/ }),
 
-/***/ 7715:
+/***/ 8056:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -18089,13 +17301,13 @@ exports.resolveWebIdentityCredentials = resolveWebIdentityCredentials;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.defaultProvider = void 0;
 const credential_provider_env_1 = __nccwpck_require__(4180);
-const credential_provider_ini_1 = __nccwpck_require__(3982);
+const credential_provider_ini_1 = __nccwpck_require__(7740);
 const credential_provider_process_1 = __nccwpck_require__(4086);
-const credential_provider_sso_1 = __nccwpck_require__(9520);
+const credential_provider_sso_1 = __nccwpck_require__(2905);
 const credential_provider_web_identity_1 = __nccwpck_require__(7928);
 const property_provider_1 = __nccwpck_require__(2669);
 const shared_ini_file_loader_1 = __nccwpck_require__(6361);
-const remoteProvider_1 = __nccwpck_require__(7522);
+const remoteProvider_1 = __nccwpck_require__(4431);
 const defaultProvider = (init = {}) => (0, property_provider_1.memoize)((0, property_provider_1.chain)(...(init.profile || process.env[shared_ini_file_loader_1.ENV_PROFILE] ? [] : [(0, credential_provider_env_1.fromEnv)()]), (0, credential_provider_sso_1.fromSSO)(init), (0, credential_provider_ini_1.fromIni)(init), (0, credential_provider_process_1.fromProcess)(init), (0, credential_provider_web_identity_1.fromTokenFile)(init), (0, remoteProvider_1.remoteProvider)(init), async () => {
     throw new property_provider_1.CredentialsProviderError("Could not load credentials from any providers", false);
 }), (credentials) => credentials.expiration !== undefined && credentials.expiration.getTime() - Date.now() < 300000, (credentials) => credentials.expiration !== undefined);
@@ -18104,19 +17316,19 @@ exports.defaultProvider = defaultProvider;
 
 /***/ }),
 
-/***/ 2531:
+/***/ 6418:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(7715), exports);
+tslib_1.__exportStar(__nccwpck_require__(8056), exports);
 
 
 /***/ }),
 
-/***/ 7522:
+/***/ 4431:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -18250,7 +17462,7 @@ exports.resolveProcessCredentials = resolveProcessCredentials;
 
 /***/ }),
 
-/***/ 178:
+/***/ 9255:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -18259,9 +17471,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.fromSSO = void 0;
 const property_provider_1 = __nccwpck_require__(2669);
 const shared_ini_file_loader_1 = __nccwpck_require__(6361);
-const isSsoProfile_1 = __nccwpck_require__(5070);
-const resolveSSOCredentials_1 = __nccwpck_require__(8196);
-const validateSsoProfile_1 = __nccwpck_require__(2751);
+const isSsoProfile_1 = __nccwpck_require__(6965);
+const resolveSSOCredentials_1 = __nccwpck_require__(7746);
+const validateSsoProfile_1 = __nccwpck_require__(9527);
 const fromSSO = (init = {}) => async () => {
     const { ssoStartUrl, ssoAccountId, ssoRegion, ssoRoleName, ssoClient } = init;
     if (!ssoStartUrl && !ssoAccountId && !ssoRegion && !ssoRoleName) {
@@ -18293,22 +17505,22 @@ exports.fromSSO = fromSSO;
 
 /***/ }),
 
-/***/ 9520:
+/***/ 2905:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(178), exports);
-tslib_1.__exportStar(__nccwpck_require__(5070), exports);
-tslib_1.__exportStar(__nccwpck_require__(4393), exports);
-tslib_1.__exportStar(__nccwpck_require__(2751), exports);
+tslib_1.__exportStar(__nccwpck_require__(9255), exports);
+tslib_1.__exportStar(__nccwpck_require__(6965), exports);
+tslib_1.__exportStar(__nccwpck_require__(8420), exports);
+tslib_1.__exportStar(__nccwpck_require__(9527), exports);
 
 
 /***/ }),
 
-/***/ 5070:
+/***/ 6965:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -18325,14 +17537,14 @@ exports.isSsoProfile = isSsoProfile;
 
 /***/ }),
 
-/***/ 8196:
+/***/ 7746:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resolveSSOCredentials = void 0;
-const client_sso_1 = __nccwpck_require__(416);
+const client_sso_1 = __nccwpck_require__(5080);
 const property_provider_1 = __nccwpck_require__(2669);
 const shared_ini_file_loader_1 = __nccwpck_require__(6361);
 const EXPIRE_WINDOW_MS = 15 * 60 * 1000;
@@ -18373,7 +17585,7 @@ exports.resolveSSOCredentials = resolveSSOCredentials;
 
 /***/ }),
 
-/***/ 4393:
+/***/ 8420:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -18383,7 +17595,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 2751:
+/***/ 9527:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -21692,7 +20904,7 @@ exports.toDate = toDate;
 
 /***/ }),
 
-/***/ 4593:
+/***/ 4755:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -21728,7 +20940,7 @@ exports.Client = Client;
 
 /***/ }),
 
-/***/ 8551:
+/***/ 9278:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -21746,7 +20958,7 @@ exports.Command = Command;
 
 /***/ }),
 
-/***/ 5623:
+/***/ 2347:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -21758,14 +20970,14 @@ exports.SENSITIVE_STRING = "***SensitiveInformation***";
 
 /***/ }),
 
-/***/ 8415:
+/***/ 1417:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseEpochTimestamp = exports.parseRfc7231DateTime = exports.parseRfc3339DateTime = exports.dateToUtcString = void 0;
-const parse_utils_1 = __nccwpck_require__(5777);
+const parse_utils_1 = __nccwpck_require__(1489);
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function dateToUtcString(date) {
@@ -21922,7 +21134,39 @@ const stripLeadingZeroes = (value) => {
 
 /***/ }),
 
-/***/ 2845:
+/***/ 8979:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.throwDefaultError = void 0;
+const exceptions_1 = __nccwpck_require__(8438);
+const throwDefaultError = ({ output, parsedBody, exceptionCtor, errorCode }) => {
+    const $metadata = deserializeMetadata(output);
+    const statusCode = $metadata.httpStatusCode ? $metadata.httpStatusCode + "" : undefined;
+    const response = new exceptionCtor({
+        name: parsedBody.code || parsedBody.Code || errorCode || statusCode || "UnknowError",
+        $fault: "client",
+        $metadata,
+    });
+    throw (0, exceptions_1.decorateServiceException)(response, parsedBody);
+};
+exports.throwDefaultError = throwDefaultError;
+const deserializeMetadata = (output) => {
+    var _a;
+    return ({
+        httpStatusCode: output.statusCode,
+        requestId: (_a = output.headers["x-amzn-requestid"]) !== null && _a !== void 0 ? _a : output.headers["x-amzn-request-id"],
+        extendedRequestId: output.headers["x-amz-id-2"],
+        cfId: output.headers["x-amz-cf-id"],
+    });
+};
+
+
+/***/ }),
+
+/***/ 7762:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -21960,7 +21204,7 @@ exports.loadConfigsForDefaultMode = loadConfigsForDefaultMode;
 
 /***/ }),
 
-/***/ 1582:
+/***/ 7649:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -21983,7 +21227,7 @@ exports.emitWarningIfUnsupportedVersion = emitWarningIfUnsupportedVersion;
 
 /***/ }),
 
-/***/ 4411:
+/***/ 8438:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -22018,7 +21262,7 @@ exports.decorateServiceException = decorateServiceException;
 
 /***/ }),
 
-/***/ 6311:
+/***/ 137:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -22035,7 +21279,7 @@ exports.extendedEncodeURIComponent = extendedEncodeURIComponent;
 
 /***/ }),
 
-/***/ 2040:
+/***/ 1927:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -22048,7 +21292,7 @@ exports.getArrayIfSingleItem = getArrayIfSingleItem;
 
 /***/ }),
 
-/***/ 7778:
+/***/ 2980:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -22072,32 +21316,35 @@ exports.getValueFromTextNode = getValueFromTextNode;
 
 /***/ }),
 
-/***/ 6449:
+/***/ 1529:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(4593), exports);
-tslib_1.__exportStar(__nccwpck_require__(8551), exports);
-tslib_1.__exportStar(__nccwpck_require__(5623), exports);
-tslib_1.__exportStar(__nccwpck_require__(8415), exports);
-tslib_1.__exportStar(__nccwpck_require__(2845), exports);
-tslib_1.__exportStar(__nccwpck_require__(1582), exports);
-tslib_1.__exportStar(__nccwpck_require__(4411), exports);
-tslib_1.__exportStar(__nccwpck_require__(6311), exports);
-tslib_1.__exportStar(__nccwpck_require__(2040), exports);
-tslib_1.__exportStar(__nccwpck_require__(7778), exports);
-tslib_1.__exportStar(__nccwpck_require__(4967), exports);
-tslib_1.__exportStar(__nccwpck_require__(5777), exports);
-tslib_1.__exportStar(__nccwpck_require__(3646), exports);
-tslib_1.__exportStar(__nccwpck_require__(9266), exports);
+tslib_1.__exportStar(__nccwpck_require__(4755), exports);
+tslib_1.__exportStar(__nccwpck_require__(9278), exports);
+tslib_1.__exportStar(__nccwpck_require__(2347), exports);
+tslib_1.__exportStar(__nccwpck_require__(1417), exports);
+tslib_1.__exportStar(__nccwpck_require__(8979), exports);
+tslib_1.__exportStar(__nccwpck_require__(7762), exports);
+tslib_1.__exportStar(__nccwpck_require__(7649), exports);
+tslib_1.__exportStar(__nccwpck_require__(8438), exports);
+tslib_1.__exportStar(__nccwpck_require__(137), exports);
+tslib_1.__exportStar(__nccwpck_require__(1927), exports);
+tslib_1.__exportStar(__nccwpck_require__(2980), exports);
+tslib_1.__exportStar(__nccwpck_require__(1268), exports);
+tslib_1.__exportStar(__nccwpck_require__(8781), exports);
+tslib_1.__exportStar(__nccwpck_require__(1489), exports);
+tslib_1.__exportStar(__nccwpck_require__(6537), exports);
+tslib_1.__exportStar(__nccwpck_require__(4334), exports);
+tslib_1.__exportStar(__nccwpck_require__(1689), exports);
 
 
 /***/ }),
 
-/***/ 4967:
+/***/ 1268:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -22143,7 +21390,89 @@ exports.LazyJsonString = LazyJsonString;
 
 /***/ }),
 
-/***/ 5777:
+/***/ 8781:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.convertMap = exports.map = void 0;
+function map(arg0, arg1, arg2) {
+    let target;
+    let filter;
+    let instructions;
+    if (typeof arg1 === "undefined" && typeof arg2 === "undefined") {
+        target = {};
+        instructions = arg0;
+    }
+    else {
+        target = arg0;
+        if (typeof arg1 === "function") {
+            filter = arg1;
+            instructions = arg2;
+            return mapWithFilter(target, filter, instructions);
+        }
+        else {
+            instructions = arg1;
+        }
+    }
+    for (const key of Object.keys(instructions)) {
+        if (!Array.isArray(instructions[key])) {
+            target[key] = instructions[key];
+            continue;
+        }
+        let [filter, value] = instructions[key];
+        if (typeof value === "function") {
+            let _value;
+            const defaultFilterPassed = filter === undefined && (_value = value()) != null;
+            const customFilterPassed = (typeof filter === "function" && !!filter(void 0)) || (typeof filter !== "function" && !!filter);
+            if (defaultFilterPassed) {
+                target[key] = _value;
+            }
+            else if (customFilterPassed) {
+                target[key] = value();
+            }
+        }
+        else {
+            const defaultFilterPassed = filter === undefined && value != null;
+            const customFilterPassed = (typeof filter === "function" && !!filter(value)) || (typeof filter !== "function" && !!filter);
+            if (defaultFilterPassed || customFilterPassed) {
+                target[key] = value;
+            }
+        }
+    }
+    return target;
+}
+exports.map = map;
+const convertMap = (target) => {
+    const output = {};
+    for (const [k, v] of Object.entries(target || {})) {
+        output[k] = [, v];
+    }
+    return output;
+};
+exports.convertMap = convertMap;
+const mapWithFilter = (target, filter, instructions) => {
+    return map(target, Object.entries(instructions).reduce((_instructions, [key, value]) => {
+        if (Array.isArray(value)) {
+            _instructions[key] = value;
+        }
+        else {
+            if (typeof value === "function") {
+                _instructions[key] = [filter, value()];
+            }
+            else {
+                _instructions[key] = [filter, value];
+            }
+        }
+        return _instructions;
+    }, {}));
+};
+
+
+/***/ }),
+
+/***/ 1489:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -22357,7 +21686,38 @@ exports.strictParseByte = strictParseByte;
 
 /***/ }),
 
-/***/ 3646:
+/***/ 6537:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolvedPath = void 0;
+const extended_encode_uri_component_1 = __nccwpck_require__(137);
+const resolvedPath = (resolvedPath, input, memberName, labelValueProvider, uriLabel, isGreedyLabel) => {
+    if (input != null && input[memberName] !== undefined) {
+        const labelValue = labelValueProvider();
+        if (labelValue.length <= 0) {
+            throw new Error("Empty value provided for input HTTP label: " + memberName + ".");
+        }
+        resolvedPath = resolvedPath.replace(uriLabel, isGreedyLabel
+            ? labelValue
+                .split("/")
+                .map((segment) => (0, extended_encode_uri_component_1.extendedEncodeURIComponent)(segment))
+                .join("/")
+            : (0, extended_encode_uri_component_1.extendedEncodeURIComponent)(labelValue));
+    }
+    else {
+        throw new Error("No value provided for input HTTP label: " + memberName + ".");
+    }
+    return resolvedPath;
+};
+exports.resolvedPath = resolvedPath;
+
+
+/***/ }),
+
+/***/ 4334:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -22382,7 +21742,7 @@ exports.serializeFloat = serializeFloat;
 
 /***/ }),
 
-/***/ 9266:
+/***/ 1689:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -22587,7 +21947,7 @@ tslib_1.__exportStar(__nccwpck_require__(8642), exports);
 
 /***/ }),
 
-/***/ 920:
+/***/ 9738:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -22604,7 +21964,7 @@ exports.IMDS_REGION_PATH = "/latest/meta-data/placement/region";
 
 /***/ }),
 
-/***/ 4025:
+/***/ 5205:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -22626,19 +21986,19 @@ exports.NODE_DEFAULTS_MODE_CONFIG_OPTIONS = {
 
 /***/ }),
 
-/***/ 9738:
+/***/ 1294:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
-tslib_1.__exportStar(__nccwpck_require__(4102), exports);
+tslib_1.__exportStar(__nccwpck_require__(7219), exports);
 
 
 /***/ }),
 
-/***/ 4102:
+/***/ 7219:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -22649,8 +22009,8 @@ const config_resolver_1 = __nccwpck_require__(9256);
 const credential_provider_imds_1 = __nccwpck_require__(9884);
 const node_config_provider_1 = __nccwpck_require__(659);
 const property_provider_1 = __nccwpck_require__(2669);
-const constants_1 = __nccwpck_require__(920);
-const defaultsModeConfig_1 = __nccwpck_require__(4025);
+const constants_1 = __nccwpck_require__(9738);
+const defaultsModeConfig_1 = __nccwpck_require__(5205);
 const resolveDefaultsModeConfig = ({ region = (0, node_config_provider_1.loadConfig)(config_resolver_1.NODE_REGION_CONFIG_OPTIONS), defaultsMode = (0, node_config_provider_1.loadConfig)(defaultsModeConfig_1.NODE_DEFAULTS_MODE_CONFIG_OPTIONS), } = {}) => (0, property_provider_1.memoize)(async () => {
     const mode = typeof defaultsMode === "function" ? await defaultsMode() : defaultsMode;
     switch (mode === null || mode === void 0 ? void 0 : mode.toLowerCase()) {
@@ -22830,7 +22190,7 @@ exports.defaultUserAgent = exports.UA_APP_ID_INI_NAME = exports.UA_APP_ID_ENV_NA
 const node_config_provider_1 = __nccwpck_require__(659);
 const os_1 = __nccwpck_require__(2037);
 const process_1 = __nccwpck_require__(7282);
-const is_crt_available_1 = __nccwpck_require__(3832);
+const is_crt_available_1 = __nccwpck_require__(4967);
 exports.UA_APP_ID_ENV_NAME = "AWS_SDK_UA_APP_ID";
 exports.UA_APP_ID_INI_NAME = "sdk-ua-app-id";
 const defaultUserAgent = ({ serviceId, clientVersion }) => {
@@ -22869,7 +22229,7 @@ exports.defaultUserAgent = defaultUserAgent;
 
 /***/ }),
 
-/***/ 3832:
+/***/ 4967:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -22920,7 +22280,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createWaiter = void 0;
 const poller_1 = __nccwpck_require__(5258);
 const utils_1 = __nccwpck_require__(349);
-const waiter_1 = __nccwpck_require__(4031);
+const waiter_1 = __nccwpck_require__(8296);
 const abortTimeout = async (abortSignal) => {
     return new Promise((resolve) => {
         abortSignal.onabort = () => resolve({ state: waiter_1.WaiterState.ABORTED });
@@ -22954,7 +22314,7 @@ exports.createWaiter = createWaiter;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __nccwpck_require__(1398);
 tslib_1.__exportStar(__nccwpck_require__(5294), exports);
-tslib_1.__exportStar(__nccwpck_require__(4031), exports);
+tslib_1.__exportStar(__nccwpck_require__(8296), exports);
 
 
 /***/ }),
@@ -22967,7 +22327,7 @@ tslib_1.__exportStar(__nccwpck_require__(4031), exports);
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runPolling = void 0;
 const sleep_1 = __nccwpck_require__(8676);
-const waiter_1 = __nccwpck_require__(4031);
+const waiter_1 = __nccwpck_require__(8296);
 const exponentialBackoffWithJitter = (minDelay, maxDelay, attemptCeiling, attempt) => {
     if (attempt > attemptCeiling)
         return maxDelay;
@@ -23062,7 +22422,7 @@ exports.validateWaiterOptions = validateWaiterOptions;
 
 /***/ }),
 
-/***/ 4031:
+/***/ 8296:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -43550,27 +42910,27 @@ module.exports = require("util");
 
 /***/ }),
 
-/***/ 6001:
+/***/ 654:
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@aws-sdk/client-app-mesh","description":"AWS SDK for JavaScript App Mesh Client for Node.js, Browser and React Native","version":"3.141.0","scripts":{"build":"concurrently \'yarn:build:cjs\' \'yarn:build:es\' \'yarn:build:types\'","build:cjs":"tsc -p tsconfig.cjs.json","build:docs":"typedoc","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","build:types:downlevel":"downlevel-dts dist-types dist-types/ts3.4","clean":"rimraf ./dist-* && rimraf *.tsbuildinfo"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/client-sts":"3.141.0","@aws-sdk/config-resolver":"3.130.0","@aws-sdk/credential-provider-node":"3.141.0","@aws-sdk/fetch-http-handler":"3.131.0","@aws-sdk/hash-node":"3.127.0","@aws-sdk/invalid-dependency":"3.127.0","@aws-sdk/middleware-content-length":"3.127.0","@aws-sdk/middleware-host-header":"3.127.0","@aws-sdk/middleware-logger":"3.127.0","@aws-sdk/middleware-recursion-detection":"3.127.0","@aws-sdk/middleware-retry":"3.127.0","@aws-sdk/middleware-serde":"3.127.0","@aws-sdk/middleware-signing":"3.130.0","@aws-sdk/middleware-stack":"3.127.0","@aws-sdk/middleware-user-agent":"3.127.0","@aws-sdk/node-config-provider":"3.127.0","@aws-sdk/node-http-handler":"3.127.0","@aws-sdk/protocol-http":"3.127.0","@aws-sdk/smithy-client":"3.137.0","@aws-sdk/types":"3.127.0","@aws-sdk/url-parser":"3.127.0","@aws-sdk/util-base64-browser":"3.109.0","@aws-sdk/util-base64-node":"3.55.0","@aws-sdk/util-body-length-browser":"3.55.0","@aws-sdk/util-body-length-node":"3.55.0","@aws-sdk/util-defaults-mode-browser":"3.137.0","@aws-sdk/util-defaults-mode-node":"3.137.0","@aws-sdk/util-user-agent-browser":"3.127.0","@aws-sdk/util-user-agent-node":"3.127.0","@aws-sdk/util-utf8-browser":"3.109.0","@aws-sdk/util-utf8-node":"3.109.0","tslib":"^2.3.1","uuid":"^8.3.2"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.58.0","@tsconfig/recommended":"1.0.1","@types/node":"^12.7.5","@types/uuid":"^8.3.0","concurrently":"7.0.0","downlevel-dts":"0.7.0","rimraf":"3.0.2","typedoc":"0.19.2","typescript":"~4.6.2"},"engines":{"node":">=12.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-app-mesh","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-app-mesh"}}');
+module.exports = JSON.parse('{"name":"@aws-sdk/client-app-mesh","description":"AWS SDK for JavaScript App Mesh Client for Node.js, Browser and React Native","version":"3.145.0","scripts":{"build":"concurrently \'yarn:build:cjs\' \'yarn:build:es\' \'yarn:build:types\'","build:cjs":"tsc -p tsconfig.cjs.json","build:docs":"typedoc","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","build:types:downlevel":"downlevel-dts dist-types dist-types/ts3.4","clean":"rimraf ./dist-* && rimraf *.tsbuildinfo"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/client-sts":"3.145.0","@aws-sdk/config-resolver":"3.130.0","@aws-sdk/credential-provider-node":"3.145.0","@aws-sdk/fetch-http-handler":"3.131.0","@aws-sdk/hash-node":"3.127.0","@aws-sdk/invalid-dependency":"3.127.0","@aws-sdk/middleware-content-length":"3.127.0","@aws-sdk/middleware-host-header":"3.127.0","@aws-sdk/middleware-logger":"3.127.0","@aws-sdk/middleware-recursion-detection":"3.127.0","@aws-sdk/middleware-retry":"3.127.0","@aws-sdk/middleware-serde":"3.127.0","@aws-sdk/middleware-signing":"3.130.0","@aws-sdk/middleware-stack":"3.127.0","@aws-sdk/middleware-user-agent":"3.127.0","@aws-sdk/node-config-provider":"3.127.0","@aws-sdk/node-http-handler":"3.127.0","@aws-sdk/protocol-http":"3.127.0","@aws-sdk/smithy-client":"3.142.0","@aws-sdk/types":"3.127.0","@aws-sdk/url-parser":"3.127.0","@aws-sdk/util-base64-browser":"3.109.0","@aws-sdk/util-base64-node":"3.55.0","@aws-sdk/util-body-length-browser":"3.55.0","@aws-sdk/util-body-length-node":"3.55.0","@aws-sdk/util-defaults-mode-browser":"3.142.0","@aws-sdk/util-defaults-mode-node":"3.142.0","@aws-sdk/util-user-agent-browser":"3.127.0","@aws-sdk/util-user-agent-node":"3.127.0","@aws-sdk/util-utf8-browser":"3.109.0","@aws-sdk/util-utf8-node":"3.109.0","tslib":"^2.3.1","uuid":"^8.3.2"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.58.0","@tsconfig/recommended":"1.0.1","@types/node":"^12.7.5","@types/uuid":"^8.3.0","concurrently":"7.0.0","downlevel-dts":"0.7.0","rimraf":"3.0.2","typedoc":"0.19.2","typescript":"~4.6.2"},"overrides":{"typedoc":{"typescript":"~4.6.2"}},"engines":{"node":">=12.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-app-mesh","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-app-mesh"}}');
 
 /***/ }),
 
-/***/ 4216:
+/***/ 8662:
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@aws-sdk/client-sso","description":"AWS SDK for JavaScript Sso Client for Node.js, Browser and React Native","version":"3.141.0","scripts":{"build":"concurrently \'yarn:build:cjs\' \'yarn:build:es\' \'yarn:build:types\'","build:cjs":"tsc -p tsconfig.cjs.json","build:docs":"typedoc","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","build:types:downlevel":"downlevel-dts dist-types dist-types/ts3.4","clean":"rimraf ./dist-* && rimraf *.tsbuildinfo"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/config-resolver":"3.130.0","@aws-sdk/fetch-http-handler":"3.131.0","@aws-sdk/hash-node":"3.127.0","@aws-sdk/invalid-dependency":"3.127.0","@aws-sdk/middleware-content-length":"3.127.0","@aws-sdk/middleware-host-header":"3.127.0","@aws-sdk/middleware-logger":"3.127.0","@aws-sdk/middleware-recursion-detection":"3.127.0","@aws-sdk/middleware-retry":"3.127.0","@aws-sdk/middleware-serde":"3.127.0","@aws-sdk/middleware-stack":"3.127.0","@aws-sdk/middleware-user-agent":"3.127.0","@aws-sdk/node-config-provider":"3.127.0","@aws-sdk/node-http-handler":"3.127.0","@aws-sdk/protocol-http":"3.127.0","@aws-sdk/smithy-client":"3.137.0","@aws-sdk/types":"3.127.0","@aws-sdk/url-parser":"3.127.0","@aws-sdk/util-base64-browser":"3.109.0","@aws-sdk/util-base64-node":"3.55.0","@aws-sdk/util-body-length-browser":"3.55.0","@aws-sdk/util-body-length-node":"3.55.0","@aws-sdk/util-defaults-mode-browser":"3.137.0","@aws-sdk/util-defaults-mode-node":"3.137.0","@aws-sdk/util-user-agent-browser":"3.127.0","@aws-sdk/util-user-agent-node":"3.127.0","@aws-sdk/util-utf8-browser":"3.109.0","@aws-sdk/util-utf8-node":"3.109.0","tslib":"^2.3.1"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.58.0","@tsconfig/recommended":"1.0.1","@types/node":"^12.7.5","concurrently":"7.0.0","downlevel-dts":"0.7.0","rimraf":"3.0.2","typedoc":"0.19.2","typescript":"~4.6.2"},"engines":{"node":">=12.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-sso","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-sso"}}');
+module.exports = JSON.parse('{"name":"@aws-sdk/client-sso","description":"AWS SDK for JavaScript Sso Client for Node.js, Browser and React Native","version":"3.145.0","scripts":{"build":"concurrently \'yarn:build:cjs\' \'yarn:build:es\' \'yarn:build:types\'","build:cjs":"tsc -p tsconfig.cjs.json","build:docs":"typedoc","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","build:types:downlevel":"downlevel-dts dist-types dist-types/ts3.4","clean":"rimraf ./dist-* && rimraf *.tsbuildinfo"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/config-resolver":"3.130.0","@aws-sdk/fetch-http-handler":"3.131.0","@aws-sdk/hash-node":"3.127.0","@aws-sdk/invalid-dependency":"3.127.0","@aws-sdk/middleware-content-length":"3.127.0","@aws-sdk/middleware-host-header":"3.127.0","@aws-sdk/middleware-logger":"3.127.0","@aws-sdk/middleware-recursion-detection":"3.127.0","@aws-sdk/middleware-retry":"3.127.0","@aws-sdk/middleware-serde":"3.127.0","@aws-sdk/middleware-stack":"3.127.0","@aws-sdk/middleware-user-agent":"3.127.0","@aws-sdk/node-config-provider":"3.127.0","@aws-sdk/node-http-handler":"3.127.0","@aws-sdk/protocol-http":"3.127.0","@aws-sdk/smithy-client":"3.142.0","@aws-sdk/types":"3.127.0","@aws-sdk/url-parser":"3.127.0","@aws-sdk/util-base64-browser":"3.109.0","@aws-sdk/util-base64-node":"3.55.0","@aws-sdk/util-body-length-browser":"3.55.0","@aws-sdk/util-body-length-node":"3.55.0","@aws-sdk/util-defaults-mode-browser":"3.142.0","@aws-sdk/util-defaults-mode-node":"3.142.0","@aws-sdk/util-user-agent-browser":"3.127.0","@aws-sdk/util-user-agent-node":"3.127.0","@aws-sdk/util-utf8-browser":"3.109.0","@aws-sdk/util-utf8-node":"3.109.0","tslib":"^2.3.1"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.58.0","@tsconfig/recommended":"1.0.1","@types/node":"^12.7.5","concurrently":"7.0.0","downlevel-dts":"0.7.0","rimraf":"3.0.2","typedoc":"0.19.2","typescript":"~4.6.2"},"overrides":{"typedoc":{"typescript":"~4.6.2"}},"engines":{"node":">=12.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-sso","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-sso"}}');
 
 /***/ }),
 
-/***/ 5655:
+/***/ 5401:
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@aws-sdk/client-sts","description":"AWS SDK for JavaScript Sts Client for Node.js, Browser and React Native","version":"3.141.0","scripts":{"build":"concurrently \'yarn:build:cjs\' \'yarn:build:es\' \'yarn:build:types\'","build:cjs":"tsc -p tsconfig.cjs.json","build:docs":"typedoc","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","build:types:downlevel":"downlevel-dts dist-types dist-types/ts3.4","clean":"rimraf ./dist-* && rimraf *.tsbuildinfo"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/config-resolver":"3.130.0","@aws-sdk/credential-provider-node":"3.141.0","@aws-sdk/fetch-http-handler":"3.131.0","@aws-sdk/hash-node":"3.127.0","@aws-sdk/invalid-dependency":"3.127.0","@aws-sdk/middleware-content-length":"3.127.0","@aws-sdk/middleware-host-header":"3.127.0","@aws-sdk/middleware-logger":"3.127.0","@aws-sdk/middleware-recursion-detection":"3.127.0","@aws-sdk/middleware-retry":"3.127.0","@aws-sdk/middleware-sdk-sts":"3.130.0","@aws-sdk/middleware-serde":"3.127.0","@aws-sdk/middleware-signing":"3.130.0","@aws-sdk/middleware-stack":"3.127.0","@aws-sdk/middleware-user-agent":"3.127.0","@aws-sdk/node-config-provider":"3.127.0","@aws-sdk/node-http-handler":"3.127.0","@aws-sdk/protocol-http":"3.127.0","@aws-sdk/smithy-client":"3.137.0","@aws-sdk/types":"3.127.0","@aws-sdk/url-parser":"3.127.0","@aws-sdk/util-base64-browser":"3.109.0","@aws-sdk/util-base64-node":"3.55.0","@aws-sdk/util-body-length-browser":"3.55.0","@aws-sdk/util-body-length-node":"3.55.0","@aws-sdk/util-defaults-mode-browser":"3.137.0","@aws-sdk/util-defaults-mode-node":"3.137.0","@aws-sdk/util-user-agent-browser":"3.127.0","@aws-sdk/util-user-agent-node":"3.127.0","@aws-sdk/util-utf8-browser":"3.109.0","@aws-sdk/util-utf8-node":"3.109.0","entities":"2.2.0","fast-xml-parser":"3.19.0","tslib":"^2.3.1"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.58.0","@tsconfig/recommended":"1.0.1","@types/node":"^12.7.5","concurrently":"7.0.0","downlevel-dts":"0.7.0","rimraf":"3.0.2","typedoc":"0.19.2","typescript":"~4.6.2"},"engines":{"node":">=12.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-sts","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-sts"}}');
+module.exports = JSON.parse('{"name":"@aws-sdk/client-sts","description":"AWS SDK for JavaScript Sts Client for Node.js, Browser and React Native","version":"3.145.0","scripts":{"build":"concurrently \'yarn:build:cjs\' \'yarn:build:es\' \'yarn:build:types\'","build:cjs":"tsc -p tsconfig.cjs.json","build:docs":"typedoc","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","build:types:downlevel":"downlevel-dts dist-types dist-types/ts3.4","clean":"rimraf ./dist-* && rimraf *.tsbuildinfo"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/config-resolver":"3.130.0","@aws-sdk/credential-provider-node":"3.145.0","@aws-sdk/fetch-http-handler":"3.131.0","@aws-sdk/hash-node":"3.127.0","@aws-sdk/invalid-dependency":"3.127.0","@aws-sdk/middleware-content-length":"3.127.0","@aws-sdk/middleware-host-header":"3.127.0","@aws-sdk/middleware-logger":"3.127.0","@aws-sdk/middleware-recursion-detection":"3.127.0","@aws-sdk/middleware-retry":"3.127.0","@aws-sdk/middleware-sdk-sts":"3.130.0","@aws-sdk/middleware-serde":"3.127.0","@aws-sdk/middleware-signing":"3.130.0","@aws-sdk/middleware-stack":"3.127.0","@aws-sdk/middleware-user-agent":"3.127.0","@aws-sdk/node-config-provider":"3.127.0","@aws-sdk/node-http-handler":"3.127.0","@aws-sdk/protocol-http":"3.127.0","@aws-sdk/smithy-client":"3.142.0","@aws-sdk/types":"3.127.0","@aws-sdk/url-parser":"3.127.0","@aws-sdk/util-base64-browser":"3.109.0","@aws-sdk/util-base64-node":"3.55.0","@aws-sdk/util-body-length-browser":"3.55.0","@aws-sdk/util-body-length-node":"3.55.0","@aws-sdk/util-defaults-mode-browser":"3.142.0","@aws-sdk/util-defaults-mode-node":"3.142.0","@aws-sdk/util-user-agent-browser":"3.127.0","@aws-sdk/util-user-agent-node":"3.127.0","@aws-sdk/util-utf8-browser":"3.109.0","@aws-sdk/util-utf8-node":"3.109.0","entities":"2.2.0","fast-xml-parser":"3.19.0","tslib":"^2.3.1"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.58.0","@tsconfig/recommended":"1.0.1","@types/node":"^12.7.5","concurrently":"7.0.0","downlevel-dts":"0.7.0","rimraf":"3.0.2","typedoc":"0.19.2","typescript":"~4.6.2"},"overrides":{"typedoc":{"typescript":"~4.6.2"}},"engines":{"node":">=12.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-sts","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-sts"}}');
 
 /***/ }),
 
