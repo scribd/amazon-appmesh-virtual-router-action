@@ -1,3 +1,11 @@
+## [1.0.56](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.55...v1.0.56) (2022-10-06)
+
+
+### Bug Fixes
+
+* **deps:** pnpm update 20221004 ([cc2d8d6](https://github.com/scribd/amazon-appmesh-virtual-router-action/commit/cc2d8d6f510ffa7e70f7546cc179e16a29aa2aec))
+* **deps:** pnpm upgrade 20220907 ([35bac0c](https://github.com/scribd/amazon-appmesh-virtual-router-action/commit/35bac0c61de4a31e9ba359a0f5295dc6a147660c))
+
 ## [1.0.55](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.54...v1.0.55) (2022-09-07)
 
 
