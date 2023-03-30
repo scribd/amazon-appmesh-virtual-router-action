@@ -1,3 +1,10 @@
+## [1.0.59-alpha.1](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.58...v1.0.59-alpha.1) (2023-03-30)
+
+
+### Bug Fixes
+
+* **deps:** update aws sdk ([29be768](https://github.com/scribd/amazon-appmesh-virtual-router-action/commit/29be7682a45bee2b364ef671dab6fde3062d68b4))
+
 ## [1.0.58](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.57...v1.0.58) (2023-03-30)
 
 
