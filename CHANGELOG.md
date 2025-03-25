@@ -1,3 +1,10 @@
+## [1.0.59](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.58...v1.0.59) (2025-03-25)
+
+
+### Bug Fixes
+
+* DEVPLAT-3294 Update github actions due to ubuntu-20.04 deprecation ([71fc6e3](https://github.com/scribd/amazon-appmesh-virtual-router-action/commit/71fc6e377e86be9b1cf9f59db93cf24bcdcc4830))
+
 ## [1.0.58](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.57...v1.0.58) (2023-03-30)
 
 
