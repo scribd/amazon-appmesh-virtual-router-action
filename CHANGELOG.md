@@ -1,3 +1,11 @@
+## [1.0.60](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.59...v1.0.60) (2026-05-06)
+
+
+### Bug Fixes
+
+* bump semantic_version to 24 for Node.js 24 compatibility [DEVPLAT-7373] ([844fe3b](https://github.com/scribd/amazon-appmesh-virtual-router-action/commit/844fe3b2653f3ada1a0e3511ae846c8075b7a294))
+* update extra_plugins to v24-compatible versions ([47e12bc](https://github.com/scribd/amazon-appmesh-virtual-router-action/commit/47e12bc3a834d2569628f5e7842d16b7c4565e85))
+
 ## [1.0.59](https://github.com/scribd/amazon-appmesh-virtual-router-action/compare/v1.0.58...v1.0.59) (2025-03-25)
 
 
